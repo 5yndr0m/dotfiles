@@ -1,8 +1,0 @@
-/**
- * Fonts Configuration
- * Place this as ~/.config/rofi/themes/fonts.rasi
- */
-
-* {
-    font: "Open Sans 12";
-}

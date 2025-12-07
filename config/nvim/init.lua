@@ -13,7 +13,7 @@ opt.undofile = true
 opt.updatetime = 250
 
 opt.clipboard = "unnamedplus"
-
+        
 opt.tabstop = 2
 opt.softtabstop = 2
 opt.expandtab = true
@@ -37,12 +37,13 @@ keymap.set('n', '<leader>w', ':write<CR>')
 keymap.set('n', '<leader>q', ':quit<CR>')
 
 vim.pack.add({
-        { src = "https://github.com/catppuccin/nvim" },
         { src = "https://github.com/stevearc/oil.nvim" },
         { src = "https://github.com/echasnovski/mini.pick" },
         { src = "https://github.com/neovim/nvim-lspconfig" },
         { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = "main" },
         { src = "https://github.com/mason-org/mason.nvim" },
+        { src = "https://github.com/christoomey/vim-tmux-navigator" },
+        { src = "https://github.com/github/copilot.vim" },
 })
 
 require "mason".setup()
@@ -50,8 +51,8 @@ require "mini.pick".setup()
 require "oil".setup()
 
 keymap.set('n', '<leader>lf', vim.lsp.buf.format)
-lsp.enable({ 'lua_ls', 'hyprls', 'clangd', 'python-lsp-server', 'basedpyright', 'qmlls',  })
-lsp.config('lua_ls', {
+vim.lsp.enable({ 'lua_ls', 'hyprls', 'clangd', 'python-lsp-server', 'basedpyright', 'qmlls',  })
+vim.lsp.config('lua_ls', {
         settings = {
                 Lua = {
                         workspace = {
@@ -60,13 +61,6 @@ lsp.config('lua_ls', {
                 }
         }
 })
-require("lspconfig").qmlls.setup {}
---require('nvim-treesitter.configs').setup({
---	auto_install = true,
---	highlight = {
---		enable = true,
---	},
---})
 
 vim.keymap.set('n', '<leader>f', ':Pick files<CR>')
 vim.keymap.set('n', '<leader>h', ':Pick help<CR>')
@@ -78,60 +72,72 @@ vim.keymap.set({ 'n', 'v', 'x' }, '<leader>d', '"+d<CR>')
 vim.keymap.set('n', 'n', 'nzz')
 vim.keymap.set('n', 'N', 'Nzz')
 
-require("catppuccin").setup({
-        flavour = "mocha",
-        background = {
-                light = "latte",
-                dark = "mocha",
-        },
-        transparent_background = true,
-        float = {
-                transparent = true,
-                solid = false,
-        },
-        show_end_of_buffer = false,
-        term_colors = false,
-        dim_inactive = {
-                enabled = false,
-                shade = "dark",
-                percentage = 0.15,
-        },
-        no_italic = false,
-        no_bold = false,
-        no_underline = false,
-        styles = {
-                comments = { "italic" },
-                conditionals = { "italic" },
-                loops = {},
-                functions = {},
-                keywords = { "bold" },
-                strings = {},
-                variables = { "bold" },
-                numbers = {},
-                booleans = {},
-                properties = {},
-                types = {},
-                operators = {},
-        },
-        color_overrides = {},
-        custom_highlights = {},
-        default_integrations = true,
-        auto_integrations = false,
-        integrations = {
-                cmp = true,
-                gitsigns = true,
-                nvimtree = true,
-                treesitter = true,
-                notify = false,
-                mini = {
-                        enabled = true,
-                        indentscope_color = "",
-                },
-        },
-})
+local nord = {
+  none      = "NONE",
+  bg        = "#2e3440",  -- nord0
+  fg        = "#d8dee9",  -- nord4
+  fg_gutter = "#4c566a",  -- nord3
+  comment   = "#88c0d0",  -- nord8
+  cyan      = "#8fbcbb",  -- nord7
+  blue      = "#81a1c1",  -- nord9
+  purple    = "#b48ead",  -- nord15
+  red       = "#bf616a",  -- nord11
+  orange    = "#d08770",  -- nord12
+  yellow    = "#ebcb8b",  -- nord13
+  green     = "#a3be8c",  -- nord14
+}
 
-vim.cmd("colorscheme catppuccin")
-vim.cmd(":hi statusline guibg=NONE")
+-- Apply Nord colors
+vim.cmd.colorscheme("default")           -- clean slate
+vim.o.background = "dark" 
+vim.o.termguicolors = true
+
+-- Core highlights
+vim.api.nvim_set_hl(0, "Normal",       { fg = nord.fg,        bg = "NONE" })
+vim.api.nvim_set_hl(0, "NormalFloat",  { fg = nord.fg,        bg = "NONE" })
+vim.api.nvim_set_hl(0, "CursorLine",   { bg = "#3b4252" })                     -- nord1
+vim.api.nvim_set_hl(0, "LineNr",       { fg = nord.fg_gutter })
+vim.api.nvim_set_hl(0, "CursorLineNr",{ fg = nord.blue, bold = true })
+vim.api.nvim_set_hl(0, "SignColumn",   { bg = "NONE" })
+vim.api.nvim_set_hl(0, "Comment",      { fg = nord.comment, italic = true })
+vim.api.nvim_set_hl(0, "String",       { fg = nord.green })
+vim.api.nvim_set_hl(0, "Keyword",      { fg = nord.blue, bold = true })
+vim.api.nvim_set_hl(0, "Function",     { fg = nord.cyan })
+vim.api.nvim_set_hl(0, "Identifier",   { fg = nord.fg, bold = true })
+vim.api.nvim_set_hl(0, "Type",         { fg = nord.blue })
+vim.api.nvim_set_hl(0, "Constant",     { fg = nord.purple })
+vim.api.nvim_set_hl(0, "Number",       { fg = nord.orange })
+vim.api.nvim_set_hl(0, "Statement",    { fg = nord.blue, italic = true })
+vim.api.nvim_set_hl(0, "PreProc",      { fg = nord.purple })
+vim.api.nvim_set_hl(0, "Special",      { fg = nord.yellow })
+
+-- Pmenu (completion)
+vim.api.nvim_set_hl(0, "Pmenu",        { fg = nord.fg, bg = "#3b4252" })
+vim.api.nvim_set_hl(0, "PmenuSel",     { fg = nord.bg, bg = nord.blue })
+vim.api.nvim_set_hl(0, "PmenuSbar",    { bg = "#434c5e" })
+vim.api.nvim_set_hl(0, "PmenuThumb",   { bg = nord.blue })
+
+-- Statusline (your custom one)
+vim.api.nvim_set_hl(0, "StatusLine",      { fg = nord.fg, bg = "NONE" })
+vim.api.nvim_set_hl(0, "StatusLineLeft",  { fg = nord.cyan })
+vim.api.nvim_set_hl(0, "StatusLineRight", { fg = nord.orange })
+vim.api.nvim_set_hl(0, "StatusLinePos",   { fg = nord.purple })
+
+-- GitSigns, LSP, etc.
+vim.api.nvim_set_hl(0, "GitSignsAdd",    { fg = nord.green })
+vim.api.nvim_set_hl(0, "GitSignsChange", { fg = nord.yellow })
+vim.api.nvim_set_hl(0, "GitSignsDelete", { fg = nord.red })
+vim.api.nvim_set_hl(0, "DiagnosticError", { fg = nord.red })
+vim.api.nvim_set_hl(0, "DiagnosticWarn",  { fg = nord.yellow })
+vim.api.nvim_set_hl(0, "DiagnosticInfo",  { fg = nord.blue })
+vim.api.nvim_set_hl(0, "DiagnosticHint",  { fg = nord.cyan })
+
+-- Oil.nvim
+vim.api.nvim_set_hl(0, "OilDir",  { fg = nord.blue })
+vim.api.nvim_set_hl(0, "OilFile", { fg = nord.fg })
+
+-- Mini.indentscope
+vim.api.nvim_set_hl(0, "MiniIndentscopeSymbol", { fg = nord.comment })
 
 vim.keymap.set({ 'n', 'i' }, '<Esc>', function()
         if vim.fn.mode() == 'n' then
@@ -149,6 +155,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
         end,
 })
 vim.cmd("set completeopt+=noselect")
+-- Fix selection visibility in foot/alacritty/kitty with transparent background
 
 -- Noob corner
 -- Disable arrows movement
@@ -184,116 +191,3 @@ end
 
 vim.opt.statusline = '%!v:lua.statusline()'
 
-local catppuccin = require("catppuccin.palettes").get_palette("mocha")
-
-vim.cmd('highlight StatusLine      guibg=NONE guifg=' .. catppuccin.text)
-vim.cmd('highlight StatusLineLeft  guibg=NONE guifg=' .. catppuccin.teal)
-vim.cmd('highlight StatusLineRight guibg=NONE guifg=' .. catppuccin.peach)
-vim.cmd('highlight StatusLinePos   guibg=NONE guifg=' .. catppuccin.mauve)
-
--- entry
-vim.api.nvim_create_autocmd("VimEnter", {
-        callback = function()
-                if vim.fn.argc() == 0 then
-                        local buf = vim.api.nvim_create_buf(false, true)
-                        local width = 60
-                        local height = 20
-                        local win = vim.api.nvim_open_win(buf, true, {
-                                relative = "editor",
-                                width = width,
-                                height = height,
-                                col = math.floor((vim.o.columns - width) / 2),
-                                row = math.floor((vim.o.lines - height) / 3),
-                                style = "minimal",
-                                border = "rounded",
-                        })
-
-                        vim.api.nvim_set_hl(0, 'DashboardHeader', { fg = catppuccin.teal }) -- Rose-Pine cyan
-                        vim.api.nvim_set_hl(0, 'DashboardSubtitle', { fg = catppuccin.rose }) -- Rose-Pine rose
-
-                        local header = {
-                                "",
-                                [[ ██╗      █████╗  ██████╗  ██████╗ ███╗   ███╗ ]],
-                                [[ ██║     ██╔══██╗██╔════╝ ██╔═══██╗████╗ ████║ ]],
-                                [[ ██║     ███████║██║  ███╗██║   ██║██╔████╔██║ ]],
-                                [[ ██║     ██╔══██║██║   ██║██║   ██║██║╚██╔╝██║ ]],
-                                [[ ███████╗██║  ██║╚██████╔╝╚██████╔╝██║ ╚═╝ ██║ ]],
-                                [[ ╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚═╝     ╚═╝ ]],
-                                "",
-                                "Just The Right Amount, Not Too Little, Not Too Much",
-                                "",
-                        }
-
-                        -- Buttons to display
-                        local buttons = {
-                                "e:      New file",
-                                "f:     Find file",
-                                "h:          Help",
-                                "c: Configuration",
-                                "q:          Quit",
-                        }
-
-                        -- Combine and center all content
-                        local centered_content = {}
-
-                        -- Center header lines
-                        for _, line in ipairs(header) do
-                                local padding = math.floor((width - vim.fn.strdisplaywidth(line)) / 2)
-                                table.insert(centered_content, string.rep(" ", padding) .. line)
-                        end
-
-                        -- Add spacing between header and buttons
-                        table.insert(centered_content, "")
-                        table.insert(centered_content, "")
-
-                        -- Center buttons
-                        for _, line in ipairs(buttons) do
-                                local padding = math.floor((width - vim.fn.strdisplaywidth(line)) / 2)
-                                table.insert(centered_content, string.rep(" ", padding) .. line)
-                        end
-
-                        -- Set buffer content
-                        vim.api.nvim_buf_set_lines(buf, 0, -1, false, centered_content)
-
-                        -- Apply syntax highlighting
-                        for i = 1, 7 do -- First 6 lines are ASCII art
-                                vim.api.nvim_buf_add_highlight(buf, -1, 'DashboardHeader', i - 1, 0, -1)
-                        end
-                        vim.api.nvim_buf_add_highlight(buf, -1, 'DashboardSubtitle', 8, 0, -1) -- Subtitle line
-
-                        -- Button highlights (starting after header + 2 empty lines)
-                        local button_start_line = #header + 2
-                        for i = 1, #buttons do
-                                vim.api.nvim_buf_add_highlight(buf, -1, 'Comment', button_start_line + i, 0, -1)
-                        end
-
-                        -- Button functionality
-                        local actions = {
-                                e = function()
-                                        vim.api.nvim_win_close(win, false)
-                                        vim.cmd("ene | startinsert")
-                                end,
-                                f = function()
-                                        vim.api.nvim_win_close(win, false)
-                                        vim.cmd("Pick files")
-                                end,
-                                h = function()
-                                        vim.api.nvim_win_close(win, false)
-                                        vim.cmd("Pick help")
-                                end,
-                                c = function()
-                                        vim.api.nvim_win_close(win, false)
-                                        vim.cmd("e ~/.config/nvim/init.lua")
-                                end,
-                                q = function()
-                                        vim.cmd("qa")
-                                end
-                        }
-
-                        -- Set keymaps
-                        for key, action in pairs(actions) do
-                                vim.keymap.set("n", key, action, { buffer = buf })
-                        end
-                end
-        end
-})

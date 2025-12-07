@@ -1,98 +1,88 @@
 {
+  "layer": "top",
   "position": "top",
-  "height": 24,
-  "modules-center": [
+  "height": 32,
+  "spacing": 8,
+  "margin-top": 0,
+  "margin-left": 0,
+  "margin-right": 0,
+
+  "modules-left": [
     "hyprland/workspaces",
-    "custom/date",
-    "clock",
-    "network",
-    "pulseaudio",
-    "battery",
-    "custom/power-profile",
-    "tray",
+    "hyprland/submap"
   ],
-  // Modules configuration
+  "modules-center": [
+  ],
+  "modules-right": [
+    "cpu",
+    "memory",
+    "battery",
+    "pulseaudio",
+    "clock"
+  ],
+
+  // ───── Dynamic Workspaces (perfect) ─────
   "hyprland/workspaces": {
     "disable-scroll": true,
-    "all-outputs": true,
+    "all-outputs": false,
     "format": "{icon}",
-    "persistent_workspaces": {
-      "1": [],
-      "2": [],
-      "3": [],
-      "4": [],
-      "5": [],
-      "6": [],
-      "7": [],
-      "8": [],
-      "9": [],
-      "10": [],
-    },
+    "on-click": "activate",
+    "sort-by-number": true,
     "format-icons": {
-      "1": "ᚠ",
-      "2": "ᚢ",
-      "3": "ᚦ",
-      "4": "ᚨ",
-      "5": "ᚱ",
-      "6": "ᚲ",
-      "7": "ᚷ",
-      "8": "ᚹ",
-      "9": "ᚺ",
-      "10": "ᚾ",
-    },
+      "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
+      "6": "6", "7": "7", "8": "8", "9": "9", "10": "0",
+      "urgent": "",
+      "focused": "",
+      "default": ""
+    }
   },
-  "custom/date": {
-    "format": "{}",
-    "interval": 3600,
-    "exec": "date '+%a %d'",
+
+  // ───── CPU ─────
+  "cpu": {
+    "format": "󰍛 {usage}%",
     "tooltip": false,
+    "on-click": "foot -e btop",
+    "interval": 2
   },
-  "custom/power-profile": {
-    "format": "{}",
-    "interval": 10,
-    "exec": "~/.config/waybar/scripts/power-profile.sh",
-    "on-click": "~/.config/waybar/scripts/power-profile.sh toggle",
-    "tooltip-format": "Power Profile: {}\nClick to cycle through profiles",
-  },
-  "clock": {
-    "format": "{:%H:%M} ",
-    "tooltip": false,
-  },
-  "tray": {
-    "icon-size": 14,
-    "spacing": 8,
-  },
-  "battery": {
+
+  // ───── Memory ─────
+  "memory": {
+    "format": "󰘚 {used:0.1f}G/{total:0.1f}G",
+    "tooltip-format": "{used:0.1f}G used • {swapUsed:0.1f}G swap",
+    "on-click": "foot -e btop",
+    "interval": 5,
     "states": {
-      "warning": 30,
-      "critical": 15,
-    },
+      "warning": 70,
+      "critical": 90
+    }
+  },
+
+  // ───── Battery ─────
+  "battery": {
+    "bat": "BAT0",
+    "interval": 30,
+    "states": { "warning": 30, "critical": 15 },
     "format": "{icon} {capacity}%",
     "format-charging": "󰂄 {capacity}%",
     "format-plugged": "󰂄 {capacity}%",
-    "format-alt": "{icon} {time}",
-    "format-full": "󱈑 {capacity}%",
-    "format-icons": ["󱊡", "󱊢", "󱊣"],
+    "format-icons": ["󰂃","󰁺","󰁻","󰁼","󰁽","󰁾","󰁿","󰂀","󰂁","󰂂","󰁹"],
+    "tooltip-format": "{timeTo} • {power}W"
   },
-  "network": {
-    "format-wifi": "  {essid}",
-    "format-ethernet": "󰤮  Disconnected",
-    "format-linked": "{ifname} (No IP) ",
-    "format-disconnected": "󰤮 Disconnected",
-    "tooltip-format-wifi": "Signal Strenght: {signalStrength}% | Down Speed: {bandwidthDownBits}, Up Speed: {bandwidthUpBits}",
-  },
+
+  // ───── Audio ─────
   "pulseaudio": {
-    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
     "format": "{icon} {volume}%",
-    "format-muted": "󰖁 Muted",
-    "format-icons": {
-      "headphone": "",
-      "hands-free": "",
-      "headset": "",
-      "phone": "",
-      "portable": "",
-      "car": "",
-      "default": ["󰕿", "󰖀", "󰕾"],
-    },
+    "format-muted": "󰝟",
+    "format-icons": { "default": ["󰕿","󰖀","󰕾","󱄠"] },
+    "scroll-step": 5,
+    "on-click": "pavucontrol",
+    "on-click-right": "wpctl set-mute @DEFAULT_SINK@ toggle"
   },
+
+  // ───── Clock + Calendar ─────
+  "clock": {
+    "timezone": "Asia/Colombo",
+    "format": "󰅐 {:%H:%M}",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+  }
 }
