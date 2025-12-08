@@ -1,33 +1,13 @@
-# dottedDotfiles ✨
+# dotfiles ✨
 
-> My personal dotfiles collection for a beautiful, minimal, and functional Arch Linux + Hyprland setup with Catppuccin Mocha theme
+> My personal dotfiles collection for a beautiful, minimal, and functional Arch Linux + Hyprland setup with Nord theme
 
 <div align="center">
 
 ![Arch Linux](https://img.shields.io/badge/OS-Arch%20Linux-1793D1?style=for-the-badge&logo=arch-linux&logoColor=white)
 ![Hyprland](https://img.shields.io/badge/WM-Hyprland-58E1FF?style=for-the-badge&logo=wayland&logoColor=black)
-![Catppuccin](https://img.shields.io/badge/Theme-Catppuccin%20Mocha-CBA6F7?style=for-the-badge)
 
 </div>
-
-## 📸 Gallery
-
-| Desktop | Eye candy | Lock Screen |
-|---------|-------------|-------------|
-| ![Desktop Screenshot](assets/justdesktop.png) | ![Eye Candy Screenshot](assets/candy.png) | ![Lock Screenshot](assets/lock.png) |
-| *WIP QuickShell Bar* | *Some Eye Candy* | *Hyprlock* |
-
-| Explorer & Terminal | Menus | Tmux, Neovim & Btop |
-|---------|-------------|-------------|
-| ![Explorer Screenshot](assets/desktop1.png) | ![Menus Screenshot](assets/menus.png) | ![tmux neovim Screenshot](assets/tmux.png) |
-| *Qrchis Purple theme & Transparent Terminal* | *Fuzzel, Atuin, & fzf* | *Tmmux, Neovim, & Btop* |
-
-| Zen Browser | Wlogout | Zed editor |
-|---------|-------------|-------------|
-| ![Browser Screenshot](assets/web.png) | ![Wlogout Screenshot](assets/wlogout.png) | ![Zed Screenshot](assets/zed.png) |
-| *Zen Browser Compact mode* | *Wlogout* | *Zed editor * |
-
----
 
 ## 🖥️ System Information
 
@@ -39,12 +19,12 @@
 | **OS** | Arch Linux |
 | **Compositor** | [Hyprland](https://github.com/hyprwm/Hyprland) |
 | **Session Manager** | [UWSM](https://github.com/Vladimir-csp/uwsm) |
-| **Status Bar & Widgets** | [QuickShell](https://github.com/quickshell-org/quickshell) |
+| **Status Bar** | [Waybar](https://github.com/Alexays/Waybar) |
 | **Launcher** | [Fuzzel](https://codeberg.org/dnkl/fuzzel) |
 | **Terminal** | [Foot](https://codeberg.org/dnkl/foot) |
 | **Lock Screen** | [Hyprlock](https://github.com/hyprwm/hyprlock) |
-| **Logout Menu** | [Wlogout](https://github.com/ArtsyMacaw/wlogout) |
-| **File Manager** | [Nautilus](https://gitlab.gnome.org/GNOME/nautilus) |
+| **Notification Daemon** | [Mako](https://github.com/emersion/mako) |
+| **File Manager** | [Thunar](https://gitlab.gnome.org/GNOME/nautilus) |
 | **Wallpaper Manager** | [Waypaper](https://github.com/anufrievroman/waypaper) |
 
 </details>
@@ -73,88 +53,33 @@
 
 </details>
 
+## 🧩 Included Configs
+
+This repository's `config/` directory contains ready-to-use configuration folders for various applications. You can find them in `config/` and copy or symlink the ones you need into `~/.config/`.
+
+Included config directories:
+- `btop` — Configuration for btop system monitor
+- `cava` — Cava audio visualizer configuration
+- `fish` — Fish shell configuration (startup, functions, prompts)
+- `foot` — Foot terminal emulator configuration
+- `fuzzel` — Fuzzel launcher configuration
+- `hypr` — Hyprland compositor configuration (layouts, binds, workspaces)
+- `mako` — Mako notification daemon configuration
+- `nvim` — Neovim setup and plugins (uses nightly in my workflow)
+- `tmux` — Tmux configuration and plugin settings
+- `uwsm` — UWSM session manager configuration
+- `waybar` — Waybar status bar configuration (alternative to QuickShell)
+- `waypaper` — Waypaper wallpaper manager configuration
+- `wlogout` — Wlogout logout menu configuration
+- `zed` — Zed editor settings
+
+If you want to apply only a subset of these, copy or symlink the corresponding folders into `~/.config/` instead of copying everything.
+
+---
+
 ## 🎨 Theme
 
-This setup uses the **Catppuccin Mocha** colorscheme throughout most applications for a cohesive and elegant dark theme experience and I have placed much emphasis on lavender color than others :)
-
----
-
-## 🚀 Installation
-
-> [!WARNING]
-> **Work in Progress**: This configuration is tailored to my specific setup and preferences. It may require adjustments for your system.
-
-### Prerequisites
-
-Ensure you have a functional Hyprland setup with all hypr ecosystem packages:
-
-```bash
-sudo pacman -S uwsm quickshell fuzzel foot hyprlock wlogout bob neovim zed nautilus tmux fish fzf atuin btop cava
-
-yay -S zen-browser-bin waypaper-git
-```
-
-### Get Neovim Nightly (0.12.+)
-```bash
-bob install nightly
-bob use nightly
-```
-
-### Quick Setup
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/5yndr0m/dottedDotfiles.git
-   cd dottedDotfiles
-   ```
-
-2. **Backup your existing configs:**
-   ```bash
-   mkdir -p ~/dotfiles-backup
-   cp -r ~/.config ~/dotfiles-backup/
-   ```
-
-3. **Apply configurations:**
-   ```bash
-   # Method 1: Direct copy (simple)
-   cp -r config/* ~/.config/
-   ```
-
-4. **Restart Hyprland or reboot**
-
-> [!NOTE]
-> A comprehensive installation script is in development for easier deployment across different systems.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Here's how you can help:
-
-- **🐛 Bug Reports**: Found an issue? Please open an issue with details
-- **📝 Documentation**: README improvements and configuration documentation
-- **🔧 QuickShell Help**: Especially looking for guidance and contributions for QuickShell configurations
-- **💡 Feature Suggestions**: Open an issue to discuss new features before implementing
-
-### Pull Request Guidelines
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Test your changes thoroughly
-4. Submit a pull request with a clear description
-
----
-
-## 💝 Acknowledgments
-
-Special thanks to these amazing projects and creators for inspiration, code snippets, and guidance:
-
-- **[end-4/dots-hyprland](https://github.com/end-4/dots-hyprland)** - Incredible Hyprland setup inspiration
-- **[caelestia-dots/caelestia](https://github.com/caelestia-dots/caelestia)** - Beautiful aesthetic references
-- **[codingjerk/dotfiles](https://github.com/codingjerk/dotfiles)** - Clean configuration structure
-- **AI Chatbots** - For troubleshooting and configuration assistance
-- **Hyprland Community** - For the amazing Configurations and continuous support
-- **Catppuccin Team** - For the beautiful color palette
+This setup uses the **Nord** colorscheme throughout most applications for a cohesive and elegant dark theme experience and I have placed much emphasis on lavender color than others :)
 
 ---
 
