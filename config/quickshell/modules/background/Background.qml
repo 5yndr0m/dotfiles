@@ -3,158 +3,96 @@ import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Wayland
-import qs.Components
-import qs.config
+import "../../core"
+import qs.components
 
 PanelWindow {
     id: bg
-    anchors.top: true
-    anchors.left: true
-    anchors.right: true
-    anchors.bottom: true
+
+    signal requestControlPanel
+
+    anchors {
+        top: true
+        bottom: true
+        left: true
+        right: true
+    }
+
     color: "transparent"
     WlrLayershell.layer: WlrLayer.Background
+    WlrLayershell.keyboardFocus: WlrLayershell.None
 
-    property date currentTime: new Date()
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: bg.currentTime = new Date()
-    }
+    Rectangle {
+        id: controlPanelHotZone
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        width: 10
+        height: parent.height / 2
+        color: "transparent" // Debug: "#55ff0000"
 
-    component ShadowText: Item {
-        property alias text: label.text
-        property alias color: label.color
-        property alias font: label.font
-        property alias horizontalAlignment: label.horizontalAlignment
-        property alias letterSpacing: label.font.letterSpacing
-
-        width: label.implicitWidth
-        height: label.implicitHeight
-
-        Text {
-            id: label
-            anchors.fill: parent
-            visible: false
-        }
-
-        DropShadow {
-            anchors.fill: label
-            horizontalOffset: 0
-            verticalOffset: 2
-            radius: 8
-            samples: 17
-            color: ThemeAuto.shadowColor
-            source: label
-            visible: label.text !== ""
+        HoverHandler {
+            cursorShape: Qt.PointingHandCursor
+            onHoveredChanged: if (hovered)
+                bg.requestControlPanel()
         }
     }
 
-    ColumnLayout {
-        anchors {
-            bottom: parent.bottom
-            right: parent.right
-            margins: 25
-        }
-        spacing: -30
+    CornerShape {
+        id: topleftCorner
+        width: 48
+        height: 48
+        anchors.left: parent.left
+        anchors.top: parent.top
+        color: Colors.colors.surface_container
+        radius: 32
+        orientation: 0 // Top Left
+    }
 
-        // 1. TIME BLOCK
-        RowLayout {
-            Layout.alignment: Qt.AlignRight
-            spacing: 12
+    CornerShape {
+        id: toprightCorner
+        width: 48
+        height: 48
+        anchors.right: parent.right
+        anchors.top: parent.top
+        color: Colors.colors.surface_container
+        radius: 32
+        orientation: 1 // Top Right
+    }
 
-            ShadowText {
-                text: Qt.formatDateTime(bg.currentTime, "HH")
-                color: ThemeAuto.accent
-                font {
-                    pixelSize: 160
-                    weight: Font.Black
-                    family: "Google Sans Display"
-                }
-                letterSpacing: -8
+    CornerShape {
+        id: bottomleftCorner
+        width: 48
+        height: 48
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        color: Colors.colors.surface_container
+        radius: 32
+        orientation: 2 // Bottom Left
+    }
+
+    CornerShape {
+        id: bottomrightCorner
+        width: 48
+        height: 48
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        color: Colors.colors.surface_container
+        radius: 32
+        orientation: 3 // Bottom Right
+    }
+
+    Rectangle {
+        id: gradient
+        anchors.fill: parent
+        gradient: Gradient {
+            orientation: Gradient.Vertical
+            GradientStop {
+                position: 0.0
+                color: "transparent"
             }
-
-            ColumnLayout {
-                spacing: -5
-                Layout.alignment: Qt.AlignBottom
-                Layout.bottomMargin: 32
-
-                ShadowText {
-                    text: Qt.formatDateTime(bg.currentTime, "ss")
-                    color: ThemeAuto.textSecondary
-                    font {
-                        pixelSize: 32
-                        weight: Font.Bold
-                        family: "Google Sans"
-                    }
-                }
-
-                ShadowText {
-                    text: Qt.formatDateTime(bg.currentTime, "mm")
-                    color: ThemeAuto.textMain
-                    font {
-                        pixelSize: 72
-                        weight: Font.Light
-                        family: "Google Sans"
-                    }
-                    letterSpacing: -2
-                }
-            }
-        }
-
-        // 2. DATE BLOCK
-        ColumnLayout {
-            Layout.alignment: Qt.AlignRight
-            spacing: 4
-
-            ShadowText {
-                text: Qt.formatDateTime(bg.currentTime, "dddd").toUpperCase()
-                color: ThemeAuto.textSecondary
-                Layout.alignment: Qt.AlignRight
-                font {
-                    pixelSize: 18
-                    weight: Font.Black
-                    family: "Google Sans"
-                }
-                letterSpacing: 4
-            }
-
-            RowLayout {
-                Layout.alignment: Qt.AlignRight
-                spacing: 12
-
-                ShadowText {
-                    text: Qt.formatDateTime(bg.currentTime, "d")
-                    color: ThemeAuto.textMain
-                    font {
-                        pixelSize: 48
-                        weight: Font.ExtraLight
-                        family: "Google Sans"
-                    }
-                }
-
-                ColumnLayout {
-                    spacing: 0
-                    ShadowText {
-                        text: Qt.formatDateTime(bg.currentTime, "MMMM")
-                        color: ThemeAuto.accent
-                        font {
-                            pixelSize: 22
-                            weight: Font.Bold
-                            family: "Google Sans"
-                        }
-                    }
-                    ShadowText {
-                        text: Qt.formatDateTime(bg.currentTime, "yyyy")
-                        color: ThemeAuto.accent
-                        font {
-                            pixelSize: 16
-                            weight: Font.Bold
-                            family: "Google Sans"
-                        }
-                    }
-                }
+            GradientStop {
+                position: 1.0
+                color: Qt.rgba(0, 0, 0, 0.6)
             }
         }
     }

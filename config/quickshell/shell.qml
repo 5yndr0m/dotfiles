@@ -1,51 +1,106 @@
 //@ pragma UseQApplication
 import Quickshell
-import QtQuick
-import Quickshell.Hyprland
-import Quickshell.Wayland
 import Quickshell.Io
+import Quickshell.Wayland
+import QtQuick
+
+import qs.modules.bar
 import qs.modules.wallpaper
+import qs.modules.notifications
 import qs.modules.lockscreen
 import qs.modules.launcher
-import qs.modules.notifications
-import qs.modules.bar
-import qs.modules.controlpanel
 import qs.modules.background
-import qs.config
+import qs.modules.controlpanel
+import qs.modules.toolbar
+import qs.modules.dashboard
+import qs.utils
+
+// ARCHON
 
 ShellRoot {
-    id: root
+    id: shellRoot
 
-    FileView {
-            path: Quickshell.env("HOME") + "/.config/quickshell/config/ThemeAuto.qml"
-            watchChanges: true
-
-            onFileChanged: {
-                console.log("Theme file change detected...")
-                // Delay reload by 100ms to ensure Matugen has finished writing the file
-                reloadTimer.restart()
+    function openControlPanel() {
+        if (!controlPanelLoader.item) {
+            controlPanelLoader.active = true;
+        } else {
+            if (!controlPanelLoader.item.visible) {
+                controlPanelLoader.item.visible = true;
+                controlPanelLoader.item.toggle();
             }
+        }
     }
 
-    Timer {
-            id: reloadTimer
-            interval: 100
-            onTriggered: {
-                console.log("Reloading configuration now.")
-                Quickshell.reload()
+    Variants {
+        model: Quickshell.screens
+
+        Bar {
+            id: bar
+            modelData: modelData
+            onNotificationCenterRequested: {
+                notifCenter.open();
             }
+        }
+    }
+
+    LazyLoader {
+        id: controlPanelLoader
+        active: false
+        source: "modules/controlpanel/ControlPanel.qml"
+
+        onItemChanged: {
+            if (item) {
+                item.closed.connect(() => {
+                    active = false;
+                });
+                item.visible = true;
+            }
+        }
     }
 
     Background {
-        id: bg
+        id: background
+        onRequestControlPanel: shellRoot.openControlPanel()
     }
 
-    WallpaperPicker {
-        id: wallpaperPicker
+    Dashboard {
+        id: dash
     }
 
     Notifications {
         id: notifications
+    }
+
+    Loader {
+        id: launcherLoader
+        active: false
+        source: "modules/launcher/Launcher.qml"
+        onLoaded: {
+            if (item)
+                item.visible = true;
+        }
+    }
+
+    Loader {
+        id: musicPopupLoader
+        active: true
+        source: "modules/music/MusicPopUp.qml"
+    }
+
+    Loader {
+        id: toolbarLoader
+        active: true
+        source: "modules/toolbar/ToolbarPopup.qml"
+    }
+
+    function toggleLauncher() {
+        if (!launcherLoader.active) {
+            launcherLoader.active = true;
+        } else {
+            if (launcherLoader.item) {
+                launcherLoader.item.visible = !launcherLoader.item.visible;
+            }
+        }
     }
 
     NotificationCenter {
@@ -71,47 +126,32 @@ ShellRoot {
         }
     }
 
-    AppLauncher {
-        id: appLauncher
-        visible: false
-    }
+    Loader {
+        id: wallpaperPickerLoader
+        active: false
+        source: "modules/wallpaper/WallpaperPicker.qml"
 
-    GlobalShortcut {
-        name: "toggleNotificationCenter"
-        description: "Toggles the persistent notification history center"
-
-        onPressed: {
-            notifCenter.isOpen = !notifCenter.isOpen;
+        onLoaded: {
+            item.visible = true;
         }
     }
 
-    GlobalShortcut {
-        name: "toggleLauncher"
-        onPressed: appLauncher.visible = !appLauncher.visible
-    }
-
-    GlobalShortcut {
-        name: "lockSession"
-        onPressed: {
-            sessionLock.locked = true;
+    function toggleWallpaperPicker() {
+        if (!wallpaperPickerLoader.active) {
+            wallpaperPickerLoader.active = true;
+        } else {
+            wallpaperPickerLoader.item.visible = !wallpaperPickerLoader.item.visible;
         }
     }
 
-    GlobalShortcut {
-        name: "toggleWallpaperPicker"
-        description: "Toggles the Quickshell wallpaper selection window"
-
-        onPressed: {
-            wallpaperPicker.visible = !wallpaperPicker.visible;
-        }
+    Shortcuts {
+        onToggleWallpaperRequested: shellRoot.toggleWallpaperPicker()
+        notifCenter: notifCenter
+        sessionLock: sessionLock
+        onToggleLauncherRequested: shellRoot.toggleLauncher()
     }
 
-    ControlPanel {
-        id: controlPanel
-    }
-
-    Bar {
-        id: bar
-        controlPanel: controlPanel
+    Component.onCompleted: {
+        console.log("Shell started in: " + Quickshell.shellDir);
     }
 }

@@ -5,190 +5,258 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Notifications
 import Quickshell.Hyprland
-
-import qs.services.notifs
-import qs.config
+import "../../core"
 
 Item {
     id: rootItem
+
+    readonly property var colors: Colors.colors
+    readonly property var tokens: Theme.values
 
     PanelWindow {
         id: root
 
         screen: {
             if (Hyprland.focusedMonitor) {
-                for (let i = 0; i < Quickshell.screens.length; i++) {
-                    let quickshellScreen = Quickshell.screens[i];
-                    if (quickshellScreen.name === Hyprland.focusedMonitor.name) {
-                        return quickshellScreen;
-                    }
-                }
+                let found = Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor.name);
+                if (found)
+                    return found;
             }
             return Quickshell.screens[0];
         }
 
-        property ListModel notificationModel: Notifs.notificationModel
-
         color: "transparent"
-        visible: Notifs.notificationModel.count > 0
+        visible: NotificationService.notificationModel.count > 0
 
         anchors.top: true
-        // anchors.horizontalCenter: parent.horizontalCenter // Uncomment if you want center alignment
+        anchors.right: true
+        margins.top: tokens.spacingL + 20
+        margins.right: tokens.spacingL
 
-        implicitWidth: 320
-        implicitHeight: notificationStack.implicitHeight + 100
+        implicitWidth: 340
+        implicitHeight: notificationStack.height
 
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
         Component.onCompleted: {
-            Notifs.animateAndRemove.connect(function (notification, index) {
-                if (notificationStack.children && notificationStack.children[index]) {
-                    let delegate = notificationStack.children[index];
-                    if (delegate && delegate.animateOut) {
+            NotificationService.animateAndRemove.connect((notification, index) => {
+                if (index >= 0 && index < notificationStack.children.length) {
+                    const delegate = notificationStack.children[index];
+                    if (delegate && delegate.animateOut)
                         delegate.animateOut();
-                    }
                 }
             });
         }
 
         Column {
             id: notificationStack
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.topMargin: 15
-            spacing: 12
-            width: 301
+            width: 310
+            spacing: tokens.spacingM
+
+            move: Transition {
+                NumberAnimation {
+                    properties: "y"
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
 
             Repeater {
-                model: root.notificationModel
+                model: NotificationService.notificationModel
 
                 delegate: Item {
                     id: delegateWrapper
-                    width: 301
-                    height: each.height + 10 // Extra space for shadow
+                    width: 310
+                    height: isRemoving ? 0 : Math.round(each.height + tokens.spacingS)
 
-                    function animateOut() { each.animateOut(); }
+                    property bool isRemoving: false
 
-                    // --- Shadow for popups to make them float ---
-                    DropShadow {
-                        anchors.fill: each
-                        horizontalOffset: 0; verticalOffset: 4
-                        radius: 12; samples: 17
-                        color: ThemeAuto.shadowColor
-                        source: each
+                    Behavior on height {
+                        NumberAnimation {
+                            duration: 250
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    function animateOut() {
+                        isRemoving = true;
+                        removalTimer.start();
+                    }
+
+                    Timer {
+                        id: removalTimer
+                        interval: 260
+                        onTriggered: NotificationService.forceRemoveNotification(model.rawNotification)
                     }
 
                     Rectangle {
                         id: each
-                        width: 301
-                        height: Math.max(80, contentColumn.implicitHeight + 24)
-                        radius: 16
-                        clip: true
+                        width: delegateWrapper.width
+                        height: contentColumn.implicitHeight + (tokens.paddingL * 2)
+                        radius: tokens.roundL
 
-                        // Use bgSurface for popups to distinguish from background panels
-                        color: (model.urgency === NotificationUrgency.Critical)
-                                ? ThemeAuto.bgContainer // Criticals get a slightly different tint
-                                : ThemeAuto.bgSurface
-
-                        border.color: (model.urgency === NotificationUrgency.Critical)
-                                ? "#ffb4ab" // Red border for critical
-                                : ThemeAuto.outline
+                        color: (model.urgency === NotificationUrgency.Critical) ? colors.error_container : colors.surface_container
+                        border.color: (model.urgency === NotificationUrgency.Critical) ? colors.error : colors.outline_variant
                         border.width: 1
 
-                        property real yOffset: -50
-                        property real opacityValue: 0.0
-                        property bool isRemoving: false
-
-                        transform: Translate { y: each.yOffset }
-                        opacity: opacityValue
-
-                        Component.onCompleted: {
-                            yOffset = 0;
-                            opacityValue = 1.0;
+                        opacity: delegateWrapper.isRemoving ? 0 : 1
+                        Behavior on opacity {
+                            NumberAnimation {
+                                duration: 200
+                                easing.type: Easing.OutCubic
+                            }
                         }
 
-                        function animateOut() {
-                            isRemoving = true;
-                            yOffset = -50;
-                            opacityValue = 0.0;
+                        DropShadow {
+                            anchors.fill: each
+                            radius: 8
+                            color: colors.shadow
+                            source: each
+                            opacity: 0.3
+                            z: -1
+                            visible: each.opacity > 0
                         }
 
-                        Timer {
-                            id: removalTimer
-                            interval: 500
-                            onTriggered: Notifs.forceRemoveNotification(model.rawNotification)
+                        HoverHandler {
+                            onHoveredChanged: {
+                                if (hovered && model.rawNotification && model.rawNotification.resetTimeout) {
+                                    model.rawNotification.resetTimeout();
+                                }
+                            }
                         }
 
-                        onIsRemovingChanged: if (isRemoving) removalTimer.start()
-
-                        Behavior on yOffset { NumberAnimation { duration: 450; easing.type: Easing.OutQuint } }
-                        Behavior on opacity { NumberAnimation { duration: 250 } }
-
-                        Column {
-                            id: contentColumn
+                        MouseArea {
                             anchors.fill: parent
-                            anchors.margins: 12
-                            spacing: 8
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (model.rawNotification && model.rawNotification.invokeDefaultAction) {
+                                    model.rawNotification.invokeDefaultAction();
+                                } else {
+                                    delegateWrapper.animateOut();
+                                }
+                            }
+                        }
+
+                        ColumnLayout {
+                            id: contentColumn
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.margins: tokens.paddingL
+                            spacing: tokens.spacingS
 
                             RowLayout {
-                                width: parent.width
-                                spacing: 8
-                                Text {
-                                    text: (model.appName || model.desktopEntry) || "System"
-                                    color: (model.urgency === NotificationUrgency.Critical) ? "#ffb4ab" : ThemeAuto.accent
-                                    font { pixelSize: 12; bold: true; family: "Google Sans" }
-                                }
-
-                                Rectangle {
-                                    width: 8; height: 8; radius: 4
-                                    color: (model.urgency === NotificationUrgency.Critical) ? "#ffb4ab" : ThemeAuto.accent
-                                    Layout.alignment: Qt.AlignVCenter
-                                    visible: model.urgency !== NotificationUrgency.Low
-                                }
-
-                                Item { Layout.fillWidth: true }
+                                Layout.fillWidth: true
+                                spacing: tokens.spacingS
 
                                 Text {
-                                    text: Notifs.formatTimestamp(model.timestamp)
-                                    color: ThemeAuto.textSecondary
-                                    font { pixelSize: 10; family: "Google Sans" }
+                                    text: (model.appName || "System").toUpperCase()
+                                    color: (model.urgency === NotificationUrgency.Critical) ? colors.on_error_container : colors.primary
+                                    font {
+                                        pixelSize: 10
+                                        bold: true
+                                        family: tokens.fontFamily
+                                    }
+                                }
+
+                                Item {
+                                    Layout.fillWidth: true
+                                }
+
+                                Text {
+                                    text: NotificationService.formatTimestamp(model.timestamp)
+                                    color: colors.on_surface_variant
+                                    font {
+                                        pixelSize: 10
+                                        family: tokens.fontFamily
+                                    }
+                                }
+
+                                MouseArea {
+                                    width: 16
+                                    height: 16
+                                    cursorShape: Qt.PointingHandCursor
+                                    z: 2
+                                    onClicked: delegateWrapper.animateOut()
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "close"
+                                        font {
+                                            family: tokens.fontFamilyMaterial
+                                            pixelSize: 16
+                                        }
+                                        color: parent.containsMouse ? colors.primary : colors.outline
+                                    }
                                 }
                             }
 
                             Text {
                                 text: model.summary || ""
-                                font { pixelSize: 14; weight: Font.Bold; family: "Google Sans" }
-                                color: ThemeAuto.textMain
-                                width: parent.width - 24
+                                font {
+                                    pixelSize: 14
+                                    weight: Font.DemiBold
+                                    family: tokens.fontFamily
+                                }
+                                color: (model.urgency === NotificationUrgency.Critical) ? colors.on_error_container : colors.on_surface
+                                Layout.fillWidth: true
                                 elide: Text.ElideRight
                             }
 
                             Text {
                                 text: model.body || ""
-                                font { pixelSize: 12; family: "Google Sans" }
-                                color: ThemeAuto.textSecondary
+                                font {
+                                    pixelSize: 12
+                                    family: tokens.fontFamily
+                                }
+                                color: colors.on_surface_variant
                                 wrapMode: Text.Wrap
-                                width: parent.width
+                                Layout.fillWidth: true
                                 maximumLineCount: 3
                                 elide: Text.ElideRight
+                                visible: text !== ""
                             }
-                        }
 
-                        // Close Button
-                        Text {
-                            anchors.top: parent.top
-                            anchors.right: parent.right
-                            anchors.margins: 10
-                            text: "close"
-                            font { family: "Material Symbols Rounded"; pixelSize: 18 }
-                            color: closeMouse.containsMouse ? ThemeAuto.accent : ThemeAuto.outline
+                            Flow {
+                                Layout.fillWidth: true
+                                Layout.topMargin: 4
+                                spacing: 8
 
-                            MouseArea {
-                                id: closeMouse
-                                anchors.fill: parent
-                                hoverEnabled: true
-                                onClicked: each.animateOut()
+                                visible: (model.rawNotification !== undefined) && (model.rawNotification.actions !== undefined) && (model.rawNotification.actions.length > 0)
+
+                                Repeater {
+                                    model: (parent.visible) ? model.rawNotification.actions : []
+
+                                    delegate: Rectangle {
+                                        width: actionTxt.implicitWidth + 24
+                                        height: 26
+                                        radius: 13
+                                        color: actionMouse.containsMouse ? colors.secondary_container : "transparent"
+                                        border.color: colors.outline
+                                        border.width: 1
+
+                                        MouseArea {
+                                            id: actionMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (modelData && modelData.invoke) {
+                                                    modelData.invoke();
+                                                    delegateWrapper.animateOut();
+                                                }
+                                            }
+                                        }
+
+                                        Text {
+                                            id: actionTxt
+                                            anchors.centerIn: parent
+                                            text: modelData.label || "Action"
+                                            font.pixelSize: 11
+                                            color: colors.on_surface
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

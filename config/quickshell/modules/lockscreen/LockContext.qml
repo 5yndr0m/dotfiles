@@ -16,11 +16,6 @@ Scope {
         if (currentText === "" || unlockInProgress)
             return;
 
-        // if (currentText === "test1234") {
-        //     root.unlocked();
-        //     return;
-        // }
-
         unlockInProgress = true;
         pam.start();
     }

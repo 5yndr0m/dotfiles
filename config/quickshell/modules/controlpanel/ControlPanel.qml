@@ -1,64 +1,105 @@
-// ControlPanel.qml
 import Quickshell
 import Quickshell.Services.Pipewire
 import QtQuick
 import QtQuick.Layouts
-import qs.config
-import qs.Components
+import qs.components
+import "../../core"
 
 PanelWindow {
     id: controlPanel
 
-    anchors.top: true
-    anchors.right: true
+    anchors {
+        top: true
+        right: true
+    }
 
-    // Keep window transparent to show rounded corners of the inner rectangle
+    margins {
+        top: Theme.values.windowMarginM
+        right: Theme.values.windowMarginM
+    }
+
     color: "transparent"
     visible: false
 
-    implicitWidth: 340
-    implicitHeight: 650
+    implicitWidth: 350
+    implicitHeight: 520
 
-    // Small offset from the screen edges for a floating look
-    margins.top: 12
-    margins.right: 12
+    // signal closed
 
-    property bool shouldBeVisible: false
-
-    function toggle() {
-        controlPanel.visible = !controlPanel.visible;
-    }
-
-    onVisibleChanged: {
-        if (visible) {
-            shouldBeVisible = true;
-            showAnimation.start();
-        } else if (shouldBeVisible) {
+    function closePanel() {
+        if (visible && !hideAnimation.running) {
             shouldBeVisible = false;
             hideAnimation.start();
         }
     }
 
-    // Dismiss panel when clicking outside (in the transparent window area)
+    function openPanel() {
+        if (!visible) {
+            visible = true;
+        }
+        closeTimer.stop();
+    }
+
+    function toggle() {
+        if (visible && !hideAnimation.running) {
+            closePanel();
+        } else {
+            openPanel();
+        }
+    }
+
+    Shortcut {
+        sequence: "Esc"
+        onActivated: controlPanel.closePanel()
+    }
+
+    HoverHandler {
+        id: mainHover
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+        onHoveredChanged: {
+            if (hovered) {
+                closeTimer.stop();
+            } else {
+                closeTimer.start();
+            }
+        }
+    }
+
     MouseArea {
         anchors.fill: parent
         z: -1
-        onClicked: controlPanel.visible = false
+        hoverEnabled: false
+        onPressed: mouse => mouse.accepted = true
+    }
+
+    Timer {
+        id: closeTimer
+        interval: 400
+        onTriggered: {
+            if (!mainHover.hovered) {
+                controlPanel.closePanel();
+            }
+        }
+    }
+
+    property bool shouldBeVisible: false
+
+    onVisibleChanged: {
+        if (visible) {
+            shouldBeVisible = true;
+            showAnimation.start();
+        }
     }
 
     Rectangle {
         id: panelRect
         anchors.fill: parent
 
-        color: ThemeAuto.bgSurface
-        radius: 24 // More rounded M3 radius
-
-        border.width: 1
-        border.color: ThemeAuto.outline
+        color: Colors.colors.surface_container
+        radius: Theme.values.roundXL
 
         opacity: 0
         scale: 0.95
-
         transform: Translate {
             id: slideTransform
             x: 330
@@ -66,51 +107,50 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 16
-            spacing: 12
+            anchors.margins: Theme.values.paddingL
+            spacing: Theme.values.spacingL
 
             ControlHeader {
                 id: header
                 Layout.fillWidth: true
             }
 
+            MenuDivider {}
+
+            PowerProfileSwitch {
+                id: powerProfileSwitch
+                Layout.fillWidth: true
+            }
+
+            QuickSettingsGrid {
+                id: quickSettingsGrid
+                Layout.fillWidth: true
+            }
+
+            MenuDivider {}
+
             ControlVolume {
                 id: volumeControl
                 Layout.fillWidth: true
             }
 
-            ControlQuickActions {
-                id: quickActions
-                Layout.fillWidth: true
-            }
-
-            ControlNowPlaying {
-                id: nowPlaying
-                Layout.fillWidth: true
-                // Note: This matches the widget we just color-swapped
-            }
-
-            ControlSystemMonitor {
-                id: systemMonitor
-                Layout.fillWidth: true
-            }
-
-            ControlWeather {
-                id: weather
-                Layout.fillWidth: true
-            }
-
             Item {
                 Layout.fillHeight: true
-            } // Spacer
+            }
         }
     }
 
-    // --- Animations ---
+    component MenuDivider: Rectangle {
+        Layout.fillWidth: true
+        Layout.preferredHeight: 1
+        Layout.leftMargin: Theme.values.paddingS
+        Layout.rightMargin: Theme.values.paddingS
+        color: Colors.colors.outline_variant
+        opacity: 0.5
+    }
 
     ParallelAnimation {
         id: showAnimation
-
         NumberAnimation {
             target: slideTransform
             property: "x"
@@ -119,7 +159,6 @@ PanelWindow {
             duration: 350
             easing.type: Easing.OutCubic
         }
-
         NumberAnimation {
             target: panelRect
             property: "opacity"
@@ -128,20 +167,18 @@ PanelWindow {
             duration: 250
             easing.type: Easing.OutCubic
         }
-
         NumberAnimation {
             target: panelRect
             property: "scale"
             from: 0.95
             to: 1.0
             duration: 350
-            easing.type: Easing.OutBack // Added a tiny bit of "pop"
+            easing.type: Easing.OutBack
         }
     }
 
     ParallelAnimation {
         id: hideAnimation
-
         NumberAnimation {
             target: slideTransform
             property: "x"
@@ -149,7 +186,6 @@ PanelWindow {
             duration: 250
             easing.type: Easing.InCubic
         }
-
         NumberAnimation {
             target: panelRect
             property: "opacity"
@@ -157,7 +193,6 @@ PanelWindow {
             duration: 200
             easing.type: Easing.InCubic
         }
-
         NumberAnimation {
             target: panelRect
             property: "scale"
@@ -165,11 +200,9 @@ PanelWindow {
             duration: 250
             easing.type: Easing.InCubic
         }
-
         onFinished: {
-            if (!shouldBeVisible) {
-                controlPanel.visible = false;
-            }
+            controlPanel.visible = false;
+            controlPanel.closed();
         }
     }
 }
