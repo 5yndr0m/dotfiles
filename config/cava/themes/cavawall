@@ -1,0 +1,19 @@
+[color]
+# Using 'primary' for the main bars to match your system accent
+# Cava requires hex codes to be inside single quotes
+gradient = 1
+
+# BOTTOM: Starting with your main bright accent
+gradient_color_5 = '#e0c46d'
+gradient_color_4 = '#e0c46d'
+
+# MIDDLE: Shifting to a slightly lighter/vibrant version
+gradient_color_3 = '#715c0c'
+gradient_color_2 = '#715c0c'
+gradient_color_1 = '#715c0c'
+
+# TOP: The "Highlight" - the brightest point
+gradient_color_6 = '#fee086'
+gradient_color_7 = '#fee086'
+gradient_color_8 = '#fee086'
+
