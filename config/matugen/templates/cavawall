@@ -1,0 +1,19 @@
+[color]
+# Using 'primary' for the main bars to match your system accent
+# Cava requires hex codes to be inside single quotes
+gradient = 1
+
+# BOTTOM: Starting with your main bright accent
+gradient_color_5 = '{{ colors.primary.default.hex }}'
+gradient_color_4 = '{{ colors.primary.default.hex }}'
+
+# MIDDLE: Shifting to a slightly lighter/vibrant version
+gradient_color_3 = '{{ colors.inverse_primary.default.hex }}'
+gradient_color_2 = '{{ colors.inverse_primary.default.hex }}'
+gradient_color_1 = '{{ colors.inverse_primary.default.hex }}'
+
+# TOP: The "Highlight" - the brightest point
+gradient_color_6 = '{{ colors.on_primary_container.default.hex }}'
+gradient_color_7 = '{{ colors.on_primary_container.default.hex }}'
+gradient_color_8 = '{{ colors.on_primary_container.default.hex }}'
+

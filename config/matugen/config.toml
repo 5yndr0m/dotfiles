@@ -1,0 +1,16 @@
+[config]
+default_type = "scheme-expressive"
+default_mode = "auto"
+
+[templates.quickshell]
+input_path = '~/.config/matugen/templates/colors.json'
+output_path = '~/.config/quickshell/core/colors.json'
+
+[templates.foot]
+input_path = '~/.config/matugen/templates/colors'
+output_path = '~/.config/foot/themes/colors' 
+post_command = 'killall -USR1 foot'
+
+[templates.cava]
+input_path = '~/.config/matugen/templates/cavawall'
+output_path = '~/.config/cava/themes/cavawall'
