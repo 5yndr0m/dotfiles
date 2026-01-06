@@ -25,3 +25,4 @@ if not ssh-add -l > /dev/null 2>&1
 end
 export QT_QPA_PLATFORM=xcb
 alias packettracer 'QT_QPA_PLATFORM=xcb /opt/pt/packettracer'
+export QT_QPA_PLATFORM=wayland
