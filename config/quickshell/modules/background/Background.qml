@@ -1,15 +1,18 @@
 import QtQuick
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
 import Quickshell
 import Quickshell.Wayland
 import "../../core"
-import qs.components
 
 PanelWindow {
-    id: bg
+    id: backgroundPanel
 
     signal requestControlPanel
+    property var modelData
+    screen: modelData || null
+
+    color: "transparent"
+    WlrLayershell.layer: WlrLayer.Background
 
     anchors {
         top: true
@@ -18,82 +21,39 @@ PanelWindow {
         right: true
     }
 
-    color: "transparent"
-    WlrLayershell.layer: WlrLayer.Background
-    WlrLayershell.keyboardFocus: WlrLayershell.None
-
+    // Hot Zone Trigger
     Rectangle {
-        id: controlPanelHotZone
+        id: sidebarTrigger
         anchors.right: parent.right
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         width: 10
-        height: parent.height / 2
-        color: "transparent" // Debug: "#55ff0000"
-
+        color: "transparent"
         HoverHandler {
-            cursorShape: Qt.PointingHandCursor
             onHoveredChanged: if (hovered)
-                bg.requestControlPanel()
+                backgroundPanel.requestControlPanel()
         }
     }
 
-    CornerShape {
-        id: topleftCorner
-        width: 48
-        height: 48
-        anchors.left: parent.left
-        anchors.top: parent.top
-        color: Colors.colors.surface_container
-        radius: 32
-        orientation: 0 // Top Left
+    ScreenCorners {
+        cornerColor: Colors.colors.surface_container
+        cornerRadius: Theme.settings.roundXL
     }
 
-    CornerShape {
-        id: toprightCorner
-        width: 48
-        height: 48
-        anchors.right: parent.right
-        anchors.top: parent.top
-        color: Colors.colors.surface_container
-        radius: 32
-        orientation: 1 // Top Right
-    }
-
-    CornerShape {
-        id: bottomleftCorner
-        width: 48
-        height: 48
+    // --- Stacked Widgets ---
+    ColumnLayout {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        color: Colors.colors.surface_container
-        radius: 32
-        orientation: 2 // Bottom Left
-    }
+        anchors.leftMargin: Theme.settings.windowMarginXL
+        anchors.bottomMargin: Theme.settings.windowMarginXL
+        spacing: 12
 
-    CornerShape {
-        id: bottomrightCorner
-        width: 48
-        height: 48
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        color: Colors.colors.surface_container
-        radius: 32
-        orientation: 3 // Bottom Right
-    }
+        Clock {
+            id: mainClock
+        }
 
-    Rectangle {
-        id: gradient
-        anchors.fill: parent
-        gradient: Gradient {
-            orientation: Gradient.Vertical
-            GradientStop {
-                position: 0.0
-                color: "transparent"
-            }
-            GradientStop {
-                position: 1.0
-                color: Qt.rgba(0, 0, 0, 0.6)
-            }
+        MediaWidget {
+            id: media
         }
     }
 }

@@ -1,0 +1,16 @@
+return {
+    bg_default = "#131318",
+    fg_default = "#e5e1e9",
+    primary = "#c3c0ff",
+    on_primary = "#2b2a60",
+    secondary = "#c7c4dd",
+    on_secondary = "#2f2e42",
+    tertiary = "#eab9d2",
+    on_tertiary = "#472639",
+    error = "#ffb4ab",
+    surface_variant = "#47464f",
+    on_surface_variant = "#c8c5d0",
+    outline = "#928f9a",
+    outline_variant = "#47464f",
+    inverse_primary = "#5a5892",
+}

@@ -1,32 +1,28 @@
 [colors]
-alpha=1.0
-# Dynamic parts: Matches your wallpaper
-background=16130b
-foreground=e9e2d4
+foreground=e5e1e9
+background=131318
 
-# Static Pastel Palette: Consistent syntax highlighting
-# Regular colors
-regular0=45475a  
-regular1=f38ba8  
-regular2=a6e3a1  
-regular3=f9e2af  
-regular4=89b4fa  
-regular5=f5c2e7  
-regular6=94e2d5  
-regular7=bac2de  
+## Normal/regular colors (color palette 0-7)
+regular0=2a292f  # black
+regular1=ffb4ab                  # red
+regular2=c3c0ff                # green
+regular3=eab9d2               # yellow
+regular4=e2dfff   # blue
+regular5=c7c4dd              # magenta
+regular6=e3e0f9 # cyan
+regular7=e5e1e9             # white
 
-# Bright colors
-bright0=585b70  
-bright1=f38ba8 
-bright2=a6e3a1   
-bright3=f9e2af   
-bright4=89b4fa   
-bright5=f5c2e7   
-bright6=94e2d5   
-bright7=a6adc8   
+## Bright colors (color palette 8-15)
+bright0=928f9a                 # bright black
+bright1=ffb4ab                   # bright red
+bright2=c3c0ff                 # bright green
+bright3=eab9d2                # bright yellow
+bright4=e2dfff    # bright blue
+bright5=c7c4dd               # bright magenta
+bright6=e3e0f9  # bright cyan
+bright7=303036      # bright white
 
-# Selection (Dynamic to feel integrated)
-selection-foreground=3c2f00
-selection-background=e0c46d
-urls=e0c46d
-
+## Misc colors
+selection-foreground=131318
+selection-background=e5e1e9
+urls=c3c0ff

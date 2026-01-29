@@ -1,5 +1,334 @@
 {
     "history": [
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668821343,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668820241,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668768525,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668753276,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668686045,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668684636,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668667045,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668570993,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668566666,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668385238,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668379088,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668063288,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "The notification service is now active.",
+            "summary": "Hello Syndrom!",
+            "timestamp": 1769668059988,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769663212373,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Disabled",
+            "summary": "Caffeine",
+            "timestamp": 1769663211730,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769660285821,
+            "urgency": 1
+        },
+        {
+            "appName": "udiskie",
+            "body": "device disappeared on /dev/sda",
+            "summary": "Device removed",
+            "timestamp": 1769616379086,
+            "urgency": 1
+        },
+        {
+            "appName": "udiskie",
+            "body": "device appeared on /dev/sda",
+            "summary": "Device added",
+            "timestamp": 1769609008481,
+            "urgency": 1
+        },
+        {
+            "appName": "udiskie",
+            "body": "device disappeared on /dev/sda",
+            "summary": "Device removed",
+            "timestamp": 1769609005016,
+            "urgency": 1
+        },
+        {
+            "appName": "nemo",
+            "body": "Device can be removed.",
+            "summary": "Kingston DataTraveler 3.0 can be safely unplugged",
+            "timestamp": 1769607691913,
+            "urgency": 1
+        },
+        {
+            "appName": "udiskie",
+            "body": "/dev/sda1: Ventoy unmounted",
+            "summary": "Device unmounted",
+            "timestamp": 1769607691824,
+            "urgency": 1
+        },
+        {
+            "appName": "nemo",
+            "body": "Device should not be unplugged.",
+            "summary": "Writing data to Kingston DataTraveler 3.0",
+            "timestamp": 1769607634473,
+            "urgency": 2
+        },
+        {
+            "appName": "udiskie",
+            "body": "/dev/sda1: Ventoy mounted on /run/media/syndrom/Ventoy",
+            "summary": "Device mounted",
+            "timestamp": 1769607542549,
+            "urgency": 1
+        },
+        {
+            "appName": "udiskie",
+            "body": "device appeared on /dev/sda",
+            "summary": "Device added",
+            "timestamp": 1769607542447,
+            "urgency": 1
+        },
+        {
+            "appName": "udiskie",
+            "body": "device disappeared on /dev/sda",
+            "summary": "Device removed",
+            "timestamp": 1769594855924,
+            "urgency": 1
+        },
+        {
+            "appName": "nemo",
+            "body": "Device can be removed.",
+            "summary": "Kingston DataTraveler 3.0 can be safely unplugged",
+            "timestamp": 1769594542123,
+            "urgency": 1
+        },
+        {
+            "appName": "udiskie",
+            "body": "/dev/sda1: Ventoy unmounted",
+            "summary": "Device unmounted",
+            "timestamp": 1769594542021,
+            "urgency": 1
+        },
+        {
+            "appName": "nemo",
+            "body": "Device should not be unplugged.",
+            "summary": "Writing data to Kingston DataTraveler 3.0",
+            "timestamp": 1769594514864,
+            "urgency": 2
+        },
+        {
+            "appName": "udiskie",
+            "body": "/dev/sda1: Ventoy mounted on /run/media/syndrom/Ventoy",
+            "summary": "Device mounted",
+            "timestamp": 1769592876808,
+            "urgency": 1
+        },
+        {
+            "appName": "udiskie",
+            "body": "device appeared on /dev/sda",
+            "summary": "Device added",
+            "timestamp": 1769592876640,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769590520560,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769588210487,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769574810754,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Disabled",
+            "summary": "Caffeine",
+            "timestamp": 1769574809745,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Recording started...",
+            "summary": "Recorder",
+            "timestamp": 1769574479090,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769574456526,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Disabled",
+            "summary": "Caffeine",
+            "timestamp": 1769574448081,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769573723628,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Disabled",
+            "summary": "Caffeine",
+            "timestamp": 1769573717753,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769573715541,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Disabled",
+            "summary": "Caffeine",
+            "timestamp": 1769573714222,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769573405769,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Disabled",
+            "summary": "Caffeine",
+            "timestamp": 1769573400353,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769534823640,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Disabled",
+            "summary": "Caffeine",
+            "timestamp": 1769534822956,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Enabled",
+            "summary": "Caffeine",
+            "timestamp": 1769533614525,
+            "urgency": 1
+        },
+        {
+            "appName": "notify-send",
+            "body": "Mode Disabled",
+            "summary": "Caffeine",
+            "timestamp": 1769533611845,
+            "urgency": 1
+        }
     ],
-    "timestamp": 1767661737411
+    "timestamp": 1769668821345
 }

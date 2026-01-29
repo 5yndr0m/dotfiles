@@ -1,41 +1,54 @@
 import QtQuick
-import QtQuick.Layouts
+// import QtQuick.Layouts
+// import Quickshell
 import Quickshell.Hyprland
 import "../../core"
 
-RowLayout {
-    spacing: Theme.values.spacingS
+Row {
+    id: root
+    spacing: Theme.settings.spacingS
 
-    Rectangle {
-        width: workspaceIdText.width + 8
-        height: parent.height - 8
-        color: Colors.colors.primary_container
-        radius: 4
-        visible: Hyprland.focusedWorkspace !== null
+    anchors.verticalCenter: parent ? parent.verticalCenter : undefined
 
-        Text {
-            id: workspaceIdText
-            anchors.centerIn: parent
-            text: Hyprland.focusedWorkspace?.id || "1"
-            color: Colors.colors.on_primary_container
-            font {
-                family: Theme.values.fontFamily
-                pixelSize: 10
-                weight: Font.Black
+    Repeater {
+        model: Hyprland.workspaces
+
+        Rectangle {
+            id: dot
+
+            property var ws: modelData
+            property bool isActive: Hyprland.focusedWorkspace === ws
+
+            height: 8
+            width: isActive ? 24 : 8
+            radius: Theme.settings.roundFull
+
+            color: {
+                if (isActive)
+                    return Colors.colors.primary;
+                return Colors.colors.surface_variant;
+            }
+
+            border.color: Colors.colors.outline_variant
+            border.width: (ws.windows > 0 && !isActive) ? 1 : 0
+
+            Behavior on width {
+                NumberAnimation {
+                    duration: 300
+                    easing.type: Easing.OutQuint
+                }
+            }
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: 200
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: ws.focus()
             }
         }
-    }
-
-    Text {
-        text: Hyprland.activeToplevel?.title || "System Ready"
-        color: Colors.colors.on_surface
-        font {
-            family: Theme.values.fontFamily
-            pixelSize: 11
-            weight: Font.Medium
-        }
-        elide: Text.ElideRight
-        Layout.maximumWidth: 250
-        verticalAlignment: Text.AlignVCenter
     }
 }

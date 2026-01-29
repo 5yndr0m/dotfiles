@@ -1,0 +1,32 @@
+{
+  "fontFamily": "Google Sans",
+  "fontFamilyMaterial": "Material Symbols Rounded",
+  "fontSize": 14,
+
+  "spacingNone": 0,
+  "spacingXS": 4,
+  "spacingS": 8,
+  "spacingM": 12,
+  "spacingL": 16,
+  "spacingXL": 24,
+
+  "paddingS": 8,
+  "paddingL": 16,
+  "elementSpacingXS": 4,
+  "elementSpacingS": 8,
+  "windowMarginM": 12,
+  "windowMarginXL": 24,
+
+  "roundNone": 0,
+  "roundS": 8,
+  "roundM": 12,
+  "roundL": 16,
+  "roundXL": 28,
+  "roundFull": 9999,
+
+  "barHeightS": 32,
+  "barHeightM": 40,
+  "iconSizeS": 18,
+  "iconSizeM": 24,
+  "iconSizeL": 32
+}

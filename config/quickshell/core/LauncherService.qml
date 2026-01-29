@@ -2,97 +2,63 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
-import "../utils/fuzzysort.js" as Fuzzysort
 
 Item {
     id: root
 
-    property bool windowVisible: false
-    property var resultsModel: ListModel {}
+    property string searchText: ""
+    property int activeIndex: 0
+    property ListModel appsModel: ListModel {}
+    property var filteredApps: []
 
-    property var appCache: []
+    // Helper to filter the model into the array
+    function updateFilter() {
+        let query = searchText.toLowerCase().trim();
+        let results = [];
+        for (let i = 0; i < appsModel.count; i++) {
+            let item = appsModel.get(i);
+            if (query === "" || item.name.toLowerCase().includes(query) || item.comment.toLowerCase().includes(query)) {
+                results.push(item);
+            }
+        }
+        filteredApps = results;
+    }
 
-    readonly property string terminal: "foot"
-    readonly property string fileManager: "nautilus"
-    readonly property string browser: "zen-browser"
-
-    readonly property string listAppsScript: Qt.resolvedUrl("../utils/apps.sh").toString().replace("file://", "")
-
-    function toggle() {
-        windowVisible = !windowVisible;
+    onSearchTextChanged: {
+        activeIndex = 0;
+        updateFilter();
     }
 
     Process {
-        id: loadAppsProcess
-        command: ["bash", "-c", root.listAppsScript]
+        id: appLoader
         running: true
+        command: ["sh", "-c", "bash " + Quickshell.shellPath("utils/apps.sh")]
 
         stdout: SplitParser {
-            onRead: data => {
-                if (data.trim() === "")
+            onRead: line => {
+                let parts = line.split("|");
+                if (parts.length < 4)
                     return;
 
-                const parts = data.split("|");
-                if (parts.length >= 2) {
-                    const name = parts[0];
-                    const exec = parts[1];
-                    const icon = parts[2] || "application-x-executable";
+                appsModel.append({
+                    "name": parts[0],
+                    "comment": parts[1],
+                    "icon": parts[2],
+                    "exec": parts[3]
+                });
 
-                    root.appCache.push({
-                        name: name,
-                        exec: exec,
-                        icon: icon,
-                        searchStr: name + " " + exec
-                    });
-                }
+                // Update the visible list as items stream in
+                if (searchText === "")
+                    updateFilter();
             }
         }
 
-        onExited: console.log(`Loaded ${root.appCache.length} apps into memory.`)
-    }
-
-    function search(query) {
-        const q = query.trim();
-        resultsModel.clear();
-
-        if (q === "" || q.startsWith(">") || q.startsWith("?") || q.startsWith("/"))
-            return;
-
-        const results = Fuzzysort.go(q, root.appCache, {
-            key: 'searchStr',
-            limit: 8,
-            threshold: -10000
-        });
-
-        results.forEach(res => {
-            resultsModel.append({
-                "name": res.obj.name,
-                "exec": res.obj.exec,
-                "icon": res.obj.icon
-            });
-        });
-    }
-
-    function launch(index) {
-        if (index >= 0 && index < resultsModel.count) {
-            const cmd = resultsModel.get(index).exec;
-            Quickshell.execDetached(["sh", "-c", cmd]);
+        onStarted: {
+            appsModel.clear();
         }
-    }
 
-    function execute(query) {
-        const q = query.trim();
-        if (q === "")
-            return;
-
-        if (q.startsWith(">")) {
-            Quickshell.execDetached([root.terminal, "sh", "-c", q.substring(1).trim()]);
-        } else if (q.startsWith("?")) {
-            Quickshell.execDetached([root.browser, "--search", q.substring(1).trim()]);
-        } else if (q.startsWith("/")) {
-            Quickshell.execDetached([root.fileManager, q]);
-        } else {
-            Quickshell.execDetached(["sh", "-c", q]);
+        onExited: code => {
+            updateFilter(); // Final pass to ensure everything is caught
         }
     }
 }

@@ -1,0 +1,16 @@
+return {
+    bg_default = "{{colors.surface.default.hex}}",
+    fg_default = "{{colors.on_surface.default.hex}}",
+    primary = "{{colors.primary.default.hex}}",
+    on_primary = "{{colors.on_primary.default.hex}}",
+    secondary = "{{colors.secondary.default.hex}}",
+    on_secondary = "{{colors.on_secondary.default.hex}}",
+    tertiary = "{{colors.tertiary.default.hex}}",
+    on_tertiary = "{{colors.on_tertiary.default.hex}}",
+    error = "{{colors.error.default.hex}}",
+    surface_variant = "{{colors.surface_variant.default.hex}}",
+    on_surface_variant = "{{colors.on_surface_variant.default.hex}}",
+    outline = "{{colors.outline.default.hex}}",
+    outline_variant = "{{colors.outline_variant.default.hex}}",
+    inverse_primary = "{{colors.inverse_primary.default.hex}}",
+}

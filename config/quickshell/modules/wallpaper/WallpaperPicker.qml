@@ -12,8 +12,8 @@ import "../../core"
 PanelWindow {
     id: pickerWindow
 
-    implicitWidth: 800 + (Theme.values.spacingXL * 8)
-    implicitHeight: 180 + (Theme.values.spacingXL * 4)
+    implicitWidth: 720 + (Theme.settings.spacingXL * 4)
+    implicitHeight: 180 + (Theme.settings.spacingXL * 2)
 
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -23,10 +23,10 @@ PanelWindow {
     color: "transparent"
     anchors.bottom: true
 
-    onVisibleChanged: {
-        if (!visible) {
-            wallpaperPickerLoader.active = false;
-
+    function toggle() {
+        visible = !visible;
+        if (visible) {
+            Qt.callLater(() => mainContainer.forceActiveFocus());
         }
     }
 
@@ -41,7 +41,9 @@ PanelWindow {
         }
     }
 
-    Process { id: runner }
+    Process {
+        id: runner
+    }
 
     function setWallpaper(path) {
         let cleanPath = decodeURIComponent(path.toString().replace(/^file:\/\//, ""));
@@ -58,22 +60,25 @@ PanelWindow {
     }
 
     function syncCurrentIndex() {
-        if (folderModel.count === 0) return;
+        if (folderModel.count === 0)
+            return;
         let folderPath = decodeURIComponent(folderModel.folder.toString().replace(/^file:\/\//, ""));
-        if (folderPath.endsWith("/")) folderPath = folderPath.slice(0, -1);
+        if (folderPath.endsWith("/"))
+            folderPath = folderPath.slice(0, -1);
 
         for (let i = 0; i < folderModel.count; i++) {
             let name = folderModel.get(i, "fileName");
             let fullPath = folderPath + "/" + name;
             if (fullPath === jsonStore.currentPath) {
-                view.currentIndex = i;
+                view.currentIndex = i + 1;
                 return;
             }
         }
     }
 
     function forceCenter() {
-        if (view.width <= 0) return;
+        if (view.width <= 0)
+            return;
         syncCurrentIndex();
         view.positionViewAtIndex(view.currentIndex, ListView.Center);
     }
@@ -85,89 +90,109 @@ PanelWindow {
             anchors.right: mainContainer.left
             anchors.bottom: mainContainer.bottom
             color: Colors.colors.surface_container
-            radius: 48
+            radius: Theme.settings.roundXL
             orientation: 3
-            width: 96
-            height: 96
+            width: Theme.settings.roundXL * 2
+            height: Theme.settings.roundXL * 2
         }
 
         CornerShape {
             anchors.left: mainContainer.right
             anchors.bottom: mainContainer.bottom
             color: Colors.colors.surface_container
-            radius: 48
+            radius: Theme.settings.roundXL
             orientation: 2
-            width: 96
-            height: 96
+            width: Theme.settings.roundXL * 2
+            height: Theme.settings.roundXL * 2
         }
 
         Rectangle {
             id: mainContainer
-            width: 850
+            width: 660
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             color: Colors.colors.surface_container
             clip: true
-            topLeftRadius: Theme.values.roundL
-            topRightRadius: Theme.values.roundL
+            topLeftRadius: Theme.settings.roundXL
+            topRightRadius: Theme.settings.roundXL
             focus: true
 
             Keys.onLeftPressed: view.decrementCurrentIndex()
             Keys.onRightPressed: view.incrementCurrentIndex()
-            Keys.onReturnPressed: if (view.currentItem) setWallpaper(view.currentItem.imageSource)
+            Keys.onReturnPressed: if (view.currentItem)
+                setWallpaper(view.currentItem.imageSource)
             Keys.onEscapePressed: pickerWindow.visible = false
 
             ListView {
                 id: view
                 anchors.fill: parent
-                anchors.margins: 25
+                anchors.margins: Theme.settings.spacingS
                 orientation: ListView.Horizontal
-                spacing: 20
+                spacing: Theme.settings.spacingXS
                 clip: true
                 highlightMoveDuration: 450
                 snapMode: ListView.SnapToItem
-                keyNavigationWraps: true
+
+                keyNavigationWraps: false
+
                 highlightRangeMode: ListView.StrictlyEnforceRange
                 preferredHighlightBegin: (width / 2) - (expandedWidth / 2)
                 preferredHighlightEnd: (width / 2) + (expandedWidth / 2)
 
-                readonly property real expandedWidth: 400
-                readonly property real collapsedWidth: 160
+                readonly property real expandedWidth: 340
+                readonly property real collapsedWidth: 144
 
                 model: FolderListModel {
                     id: folderModel
                     folder: "file://" + Quickshell.env("HOME") + "/Pictures/wallpapers"
                     nameFilters: ["*.jpg", "*.png", "*.webp", "*.jpeg"]
-                    onStatusChanged: if (status === FolderListModel.Ready) Qt.callLater(forceCenter)
+                    onStatusChanged: if (status === FolderListModel.Ready)
+                        Qt.callLater(forceCenter)
                 }
 
                 delegate: Item {
                     id: wrapper
                     readonly property string imageSource: folderModel.folder + "/" + fileName
+
+                    readonly property bool isPrevious: index === view.currentIndex - 1
+                    readonly property bool isNext: index === view.currentIndex + 1
+
                     height: view.height
                     width: ListView.isCurrentItem ? view.expandedWidth : view.collapsedWidth
                     clip: true
                     z: ListView.isCurrentItem ? 10 : 1
 
                     Behavior on width {
-                        NumberAnimation { duration: 450; easing.type: Easing.OutQuint }
+                        NumberAnimation {
+                            duration: 450
+                            easing.type: Easing.OutQuint
+                        }
                     }
 
                     Rectangle {
                         id: imageContainer
                         anchors.fill: parent
-                        radius: 16
+                        radius: Theme.settings.roundM
                         color: Colors.colors.surface
                         clip: true
                         border.color: wrapper.ListView.isCurrentItem ? Colors.colors.primary : Colors.colors.outline
-                        border.width: wrapper.ListView.isCurrentItem ? 3 : 1
+                        border.width: wrapper.ListView.isCurrentItem ? 3 : 0
+
+                        topLeftRadius: wrapper.isPrevious ? Theme.settings.roundXL : Theme.settings.roundM
+                        bottomLeftRadius: wrapper.isPrevious ? Theme.settings.roundXL : Theme.settings.roundM
+                        topRightRadius: wrapper.isNext ? Theme.settings.roundXL : Theme.settings.roundM
+                        bottomRightRadius: wrapper.isNext ? Theme.settings.roundXL : Theme.settings.roundM
 
                         Rectangle {
                             id: maskRect
                             anchors.fill: parent
-                            radius: 16
+                            radius: Theme.settings.roundM
                             visible: false
+                            topLeftRadius: parent.topLeftRadius
+                            bottomLeftRadius: parent.bottomLeftRadius
+                            topRightRadius: parent.topRightRadius
+                            bottomRightRadius: parent.bottomRightRadius
                         }
 
                         Image {
@@ -176,12 +201,16 @@ PanelWindow {
                             anchors.margins: parent.border.width
                             source: imageSource
                             fillMode: Image.PreserveAspectCrop
-                            sourceSize.width: 300
+                            sourceSize.width: 400
                             asynchronous: true
                             visible: false
                             opacity: wrapper.ListView.isCurrentItem ? 1.0 : 0.4
 
-                            Behavior on opacity { NumberAnimation { duration: 400 } }
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: 400
+                                }
+                            }
                         }
 
                         OpacityMask {

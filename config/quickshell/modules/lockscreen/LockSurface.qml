@@ -11,7 +11,7 @@ Rectangle {
     required property LockContext context
 
     readonly property var colors: Colors.colors
-    readonly property var tokens: Theme.values
+    readonly property var tokens: Theme.settings
 
     color: colors.surface
 
@@ -52,34 +52,39 @@ Rectangle {
         onTriggered: root.context.tryUnlock()
     }
 
-    Connections {
-        target: NetworkService
-        function onIsConnectedChanged() {
-            console.log("DEBUG - isConnected changed to: " + NetworkService.isConnected);
-        }
-        function onConnectedNameChanged() {
-            console.log("DEBUG - SSID changed to: " + NetworkService.connectedName);
-        }
+    BatteryPill {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.topMargin: 25
+        anchors.leftMargin: 25
+        colors: root.colors
+        tokens: root.tokens
+    }
+
+    StatusIndicatorsRow {
+        id: statusRow
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: 25
+        anchors.rightMargin: 25
+
+        colors: root.colors
+        tokens: root.tokens
     }
 
     ColumnLayout {
-        anchors.right: parent.right
-        anchors.rightMargin: 50
-
-        anchors.verticalCenter: parent.verticalCenter
-        Layout.fillHeight: false
-
-        spacing: tokens.spacingM
+        id: centerStack
+        anchors.centerIn: parent
+        spacing: 20
         width: 400
 
         WeatherTimeRow {
-
             colors: root.colors
             tokens: root.tokens
-            weatherData: WeatherService
         }
 
-        UserBatteryRow {
+        UserInfo {
+            Layout.alignment: Qt.AlignHCenter
             colors: root.colors
             tokens: root.tokens
         }
@@ -90,15 +95,18 @@ Rectangle {
             context: root.context
             onAccepted: waitTimer.start()
         }
+    }
 
-        MusicRow {
-            colors: root.colors
-            tokens: root.tokens
-        }
+    MusicRow {
+        id: musicRow
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 50
+        anchors.horizontalCenter: parent.horizontalCenter
 
-        StatusIndicatorsRow {
-            colors: root.colors
-            tokens: root.tokens
-        }
+        width: 400
+        height: 80
+
+        colors: root.colors
+        tokens: root.tokens
     }
 }

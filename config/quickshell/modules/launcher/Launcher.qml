@@ -1,15 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Controls
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Widgets
 import "../../core"
-import qs.components
 
 PanelWindow {
     id: launcherWindow
-
-    color: "transparent"
     anchors {
         top: true
         left: true
@@ -17,177 +14,220 @@ PanelWindow {
         bottom: true
     }
 
+    visible: false
+    color: "transparent"
+
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
     onVisibleChanged: {
         if (visible) {
+            LauncherService.searchText = "";
+            LauncherService.activeIndex = 0;
             searchInput.text = "";
-            Qt.callLater(() => searchInput.forceActiveFocus());
+            searchInput.forceActiveFocus();
+            appList.positionViewAtBeginning();
         }
     }
 
-    property int itemHeight: 50
-    property int visibleItems: 2
-
-    MouseArea {
-        anchors.fill: parent
-        onClicked: launcherWindow.visible = false
+    function toggle() {
+        if (visible) {
+            closeAnim.start();
+        } else {
+            launcherWindow.visible = true;
+            openAnim.start();
+        }
     }
 
-    CornerShape {
-        id: leftCorner
-        width: 64
-        height: 64
-        anchors.right: launcherBox.left
-        anchors.bottom: launcherBox.bottom
-        color: launcherBox.color
-        radius: width
-        orientation: 3
+    ParallelAnimation {
+        id: openAnim
+        NumberAnimation {
+            target: content
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: 150
+            easing.type: Easing.OutCubic
+        }
+        NumberAnimation {
+            target: content
+            property: "scale"
+            from: 0.98
+            to: 1
+            duration: 150
+            easing.type: Easing.OutCubic
+        }
     }
 
-    CornerShape {
-        id: rightCorner
-        width: 64
-        height: 64
-        anchors.left: launcherBox.right
-        anchors.bottom: launcherBox.bottom
-        color: launcherBox.color
-        radius: width
-        orientation: 2
+    SequentialAnimation {
+        id: closeAnim
+        ParallelAnimation {
+            NumberAnimation {
+                target: content
+                property: "opacity"
+                to: 0
+                duration: 100
+            }
+            NumberAnimation {
+                target: content
+                property: "scale"
+                to: 0.98
+                duration: 100
+            }
+        }
+        ScriptAction {
+            script: {
+                launcherWindow.visible = false;
+            }
+        }
     }
 
     Rectangle {
-        id: launcherBox
-        width: 500
-        height: layout.implicitHeight
-
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        color: Colors.colors.surface
-        topLeftRadius: Theme.values.roundL
-        topRightRadius: Theme.values.roundL
-        bottomLeftRadius: 0
-        bottomRightRadius: 0
-
-        clip: true
-
+        anchors.fill: parent
+        color: Colors.colors.scrim
+        opacity: launcherWindow.visible ? 0.3 : 0
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 150
+            }
+        }
         MouseArea {
             anchors.fill: parent
-            hoverEnabled: false
+            onClicked: launcherWindow.toggle()
         }
+    }
+
+    Rectangle {
+        id: content
+        anchors.centerIn: parent
+        width: 500
+        height: 420
+        color: Colors.colors.surface
+        radius: Theme.settings.roundL
+        clip: true
 
         ColumnLayout {
-            id: layout
             anchors.fill: parent
-            spacing: 0
+            anchors.margins: Theme.settings.spacingM
+            spacing: Theme.settings.spacingS
 
-            ListView {
-                id: resultsList
+            Rectangle {
                 Layout.fillWidth: true
-                Layout.fillHeight: false
-                Layout.preferredHeight: launcherWindow.visibleItems * launcherWindow.itemHeight
-                Layout.topMargin: 10
-                Layout.bottomMargin: 10
+                height: 48
+                color: Colors.colors.surface_container_high
+                radius: Theme.settings.roundM
 
-                interactive: true
-                clip: true
-                boundsBehavior: Flickable.StopAtBounds
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: Theme.settings.spacingM
+                    spacing: Theme.settings.spacingS
 
-                model: LauncherService.resultsModel
-                currentIndex: 0
-                verticalLayoutDirection: ListView.BottomToTop
-
-                delegate: Rectangle {
-                    width: resultsList.width
-                    height: launcherWindow.itemHeight
-                    radius: Theme.values.roundS
-                    color: (ListView.isCurrentItem || mouseArea.containsMouse) ? Colors.colors.surface_container_high : "transparent"
-
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            launcherWindow.visible = false;
-                            LauncherService.launch(index);
-                        }
+                    Text {
+                        text: "\ue8b6"
+                        font.family: Theme.settings.fontFamilyMaterial
+                        font.pixelSize: Theme.settings.iconSizeS
+                        color: Colors.colors.on_surface_variant
                     }
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: Theme.values.paddingL
-                        anchors.rightMargin: Theme.values.paddingL
-                        spacing: Theme.values.spacingM
+                    TextInput {
+                        id: searchInput
+                        Layout.fillWidth: true
+                        color: Colors.colors.on_surface
+                        font.family: Theme.settings.fontFamily
+                        font.pixelSize: 16
+                        focus: launcherWindow.visible
+                        onTextChanged: LauncherService.searchText = text
 
-                        Image {
-                            Layout.preferredWidth: 32
-                            Layout.preferredHeight: 32
-                            source: (model.icon && model.icon.indexOf("/") === -1) ? "image://icon/" + model.icon : (model.icon || "")
-                            visible: status === Image.Ready
-                        }
-                        Text {
-                            Layout.fillWidth: true
-                            text: model.name
-                            color: Colors.colors.on_surface
-                            font.family: Theme.values.fontFamily
-                            font.pixelSize: 14
-                            Layout.alignment: Qt.AlignVCenter
+                        Keys.onPressed: event => {
+                            let count = LauncherService.filteredApps.length;
+                            if (event.key === Qt.Key_Escape)
+                                launcherWindow.toggle();
+
+                            if (event.key === Qt.Key_Down) {
+                                LauncherService.activeIndex = (LauncherService.activeIndex + 1) % count;
+                                appList.positionViewAtIndex(LauncherService.activeIndex, ListView.Contain);
+                            }
+                            if (event.key === Qt.Key_Up) {
+                                LauncherService.activeIndex = (LauncherService.activeIndex - 1 + count) % count;
+                                appList.positionViewAtIndex(LauncherService.activeIndex, ListView.Contain);
+                            }
+                            if (event.key === Qt.Key_Return && count > 0) {
+                                Quickshell.execDetached(["sh", "-c", LauncherService.filteredApps[LauncherService.activeIndex].exec]);
+                                closeAnim.start();
+                            }
                         }
                     }
                 }
             }
 
-            // Rectangle {
-            //     Layout.fillWidth: true
-            //     Layout.preferredHeight: 1
-            //     color: Colors.colors.outline_variant
-            //     visible: true
-            // }
-
-            RowLayout {
+            ListView {
+                id: appList
                 Layout.fillWidth: true
-                Layout.preferredHeight: 48
-                Layout.margins: Theme.values.paddingL
-                spacing: Theme.values.spacingM
+                Layout.fillHeight: true
+                model: LauncherService.filteredApps
+                spacing: 2
+                clip: true
 
-                Text {
-                    text: "search"
-                    font.family: Theme.values.fontFamilyMaterial
-                    font.pixelSize: 20
-                    color: Colors.colors.primary
-                    Layout.alignment: Qt.AlignVCenter
-                }
+                delegate: Rectangle {
+                    id: delegateRoot
+                    width: appList.width
+                    implicitHeight: Math.max(48, contentRow.implicitHeight + 16)
+                    radius: Theme.settings.roundS
+                    color: LauncherService.activeIndex === index ? Colors.colors.secondary_container : "transparent"
 
-                TextField {
-                    id: searchInput
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignVCenter
-                    color: Colors.colors.on_surface
-                    font.family: Theme.values.fontFamily
-                    font.pixelSize: 16
-                    focus: true
-                    placeholderText: "Search..."
-                    placeholderTextColor: Colors.colors.on_surface_variant
-                    background: Item {}
-                    onTextChanged: LauncherService.search(text)
+                    RowLayout {
+                        id: contentRow
+                        anchors.fill: parent
+                        anchors.leftMargin: Theme.settings.spacingM
+                        anchors.rightMargin: Theme.settings.spacingM
+                        spacing: Theme.settings.spacingM
 
-                    onAccepted: {
-                        launcherWindow.visible = false;
-                        if (LauncherService.resultsModel.count > 0) {
-                            var idx = resultsList.currentIndex >= 0 ? resultsList.currentIndex : 0;
-                            LauncherService.launch(idx);
+                        IconImage {
+                            Layout.preferredWidth: Theme.settings.iconSizeM
+                            Layout.preferredHeight: Theme.settings.iconSizeM
+                            Layout.alignment: Qt.AlignVCenter
+                            source: modelData.icon.startsWith("/") ? "file://" + modelData.icon : Quickshell.iconPath(modelData.icon || "application-x-executable")
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter
+                            spacing: 0
+
+                            Text {
+                                text: modelData.name
+                                color: LauncherService.activeIndex === index ? Colors.colors.on_secondary_container : Colors.colors.on_surface
+                                font.family: Theme.settings.fontFamily
+                                font.pixelSize: 14
+                                font.weight: Font.DemiBold
+                                Layout.fillWidth: true
+                                elide: Text.ElideRight
+                            }
+
+                            Text {
+                                text: modelData.comment
+                                color: LauncherService.activeIndex === index ? Colors.colors.on_secondary_container : Colors.colors.on_surface_variant
+                                opacity: 0.8
+                                font.family: Theme.settings.fontFamily
+                                font.pixelSize: 10
+
+                                wrapMode: Text.WordWrap
+                                maximumLineCount: 2
+                                elide: Text.ElideRight
+                                Layout.fillWidth: true
+
+                                visible: modelData.comment !== "" && modelData.comment !== "Application"
+                            }
                         }
                     }
 
-                    Keys.onPressed: event => {
-                        if (event.key === Qt.Key_Escape) {
-                            launcherWindow.visible = false;
-                        } else if (event.key === Qt.Key_Down) {
-                            resultsList.decrementCurrentIndex();
-                        } else if (event.key === Qt.Key_Up) {
-                            resultsList.incrementCurrentIndex();
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onEntered: LauncherService.activeIndex = index
+                        onClicked: {
+                            Quickshell.execDetached(["sh", "-c", modelData.exec]);
+                            closeAnim.start();
                         }
                     }
                 }

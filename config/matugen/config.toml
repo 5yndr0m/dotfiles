@@ -1,6 +1,7 @@
 [config]
 default_type = "scheme-expressive"
-default_mode = "auto"
+default_mode = "dark"
+reload_apps = true
 
 [templates.quickshell]
 input_path = '~/.config/matugen/templates/colors.json'
@@ -8,9 +9,59 @@ output_path = '~/.config/quickshell/core/colors.json'
 
 [templates.foot]
 input_path = '~/.config/matugen/templates/colors'
-output_path = '~/.config/foot/themes/colors' 
+output_path = '~/.config/foot/themes/colors'
 post_command = 'killall -USR1 foot'
 
+[templates.hyprland]
+input_path = '~/.config/matugen/templates/colors.conf'
+output_path = '~/.config/hypr/colors.conf'
+
+[templates.obsidian]
+input_path = "~/.config/matugen/templates/obsidian-minimal.css"
+output_path = "~/Documents/GitHub/obsidian_vault/.obsidian/snippets/custom.css"
+
+[templates.gtk3]
+input_path = "~/.config/matugen/templates/gtk-colors.css"
+output_path = '~/.config/gtk-3.0/colors.css'
+post_hook = 'gsettings set org.gnome.desktop.interface gtk-theme ""; gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-{{mode}}'
+
+[templates.gtk4]
+input_path = "~/.config/matugen/templates/gtk-colors.css"
+output_path = '~/.config/gtk-4.0/colors.css'
+
+[templates.pywalfox]
+input_path = '~/.config/matugen/templates/pywal-colors.json'
+output_path = '~/.cache/wal/colors.json'
+post_hook = 'pywalfox update'
+
+[templates.zathura]
+input_path = '~/.config/matugen/templates/zathura-colors'
+output_path = '~/.config/zathura/zathurarc'
+
 [templates.cava]
-input_path = '~/.config/matugen/templates/cavawall'
-output_path = '~/.config/cava/themes/cavawall'
+input_path = '~/.config/matugen/templates/cava-colors.ini'
+output_path = '~/.config/cava/themes/matugen'
+post_hook = "pkill -USR1 cava"
+
+[templates.btop]
+input_path = '~/.config/matugen/templates/btop.theme'
+output_path = '~/.config/btop/themes/matugen.theme'
+
+[templates.zed]
+input_path = '~/.config/matugen/templates/zed-colors.json'
+output_path = '~/.config/zed/themes/matugen.json'
+
+[templates.nvim]
+input_path = '~/.config/matugen/templates/nvim-colors.lua'
+output_path = '~/.config/nvim/lua/matugen_colors.lua'
+
+[templates.tmux]
+input_path = '~/.config/matugen/templates/tmux-colors.conf'
+output_path = '~/.config/tmux/generated.conf'
+post_hook = 'tmux source-file ~/.config/tmux/tmux.conf'
+
+[templates.kitty]
+input_path = '~/.config/matugen/templates/kitty-colors.conf'
+output_path = '~/.config/kitty/kittycolors.conf'
+post_hook = 'pkill -SIGUSR1 kitty'
+# post_hook = "kitty +kitten themes --reload-in=all kittycolors.conf"

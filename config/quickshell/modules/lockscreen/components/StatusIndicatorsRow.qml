@@ -2,88 +2,63 @@ import QtQuick
 import QtQuick.Layouts
 import "../../../core"
 
-RowLayout {
-    spacing: tokens.spacingM
-    Layout.fillWidth: true
+Rectangle {
+    id: root
+    width: layout.implicitWidth + 24
+    height: 36
+
+    color: colors.surface_container_high
+    radius: height / 2
+    border.color: colors.outline_variant
+    border.width: 1
 
     property var colors
     property var tokens
 
-    Repeater {
-        model: [
-            {
-                icon: NetworkService.isConnected ? "wifi" : "wifi_off",
-                label: NetworkService.isConnected ? "Connected" : "Disconnected",
-                subValue: NetworkService.isConnected ? NetworkService.connectedName : "Not Connected",
-                active: NetworkService.isConnected
-            },
-            {
-                icon: BluetoothService.isPowered ? "bluetooth" : "bluetooth_disabled",
-                label: BluetoothService.isPowered ? "Bluetooth" : "Off",
-                subValue: !BluetoothService.isPowered ? "Disabled" : (BluetoothService.pairedDevices.length > 0 ? "Connected" : "On"),
-                active: BluetoothService.isPowered
-            },
-            {
-                icon: "notifications",
-                label: "History",
-                subValue: NotificationService.historyModel.count + " New",
-                active: NotificationService.historyModel.count > 0
-            }
-        ]
+    RowLayout {
+        id: layout
+        anchors.centerIn: parent
+        spacing: 12
 
-        delegate: Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 70
-            radius: 24
-            color: colors.surface_container_low
-            border.color: modelData.active ? colors.primary : colors.outline_variant
-            border.width: modelData.active ? 1.5 : 1
-
-            ColumnLayout {
-                anchors.centerIn: parent
-                spacing: 4
-                RowLayout {
-                    Layout.alignment: Qt.AlignHCenter
-                    spacing: 8
-
-                    Text {
-                        text: modelData.icon
-                        font {
-                            family: tokens.fontFamilyMaterial
-                            pixelSize: 20
-                        }
-                        color: modelData.active ? colors.primary : colors.on_surface_variant
-                    }
-                    Text {
-                        text: modelData.label
-                        color: colors.on_surface
-                        font {
-                            family: tokens.fontFamily
-                            pixelSize: 11
-                            weight: Font.Medium
-                        }
-                    }
+        Repeater {
+            model: [
+                {
+                    icon: NetworkService.isConnected ? "signal_wifi_4_bar" : "signal_wifi_off",
+                    active: NetworkService.isConnected
+                },
+                {
+                    icon: BluetoothService.isPowered ? "bluetooth" : "bluetooth_disabled",
+                    active: BluetoothService.isPowered
+                },
+                {
+                    icon: "notifications",
+                    active: NotificationService.historyModel.count > 0
                 }
+            ]
+
+            delegate: Item {
+                Layout.preferredWidth: 20
+                Layout.preferredHeight: 20
+
                 Text {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: modelData.subValue
-                    color: colors.on_surface_variant
+                    anchors.centerIn: parent
+                    text: modelData.icon
                     font {
-                        family: tokens.fontFamily
-                        pixelSize: 10
+                        family: tokens.fontFamilyMaterial
+                        pixelSize: 18
                     }
-                    elide: Text.ElideRight
-                    Layout.maximumWidth: parent.width - 24
+                    color: modelData.active ? colors.primary : colors.on_surface_variant
+                    opacity: modelData.active ? 1.0 : 0.4
                 }
-            }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    if (index === 0)
-                        NetworkService.scan();
-                    else if (index === 1)
-                        BluetoothService.togglePower();
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (index === 0)
+                            NetworkService.scan();
+                        else if (index === 1)
+                            BluetoothService.togglePower();
+                    }
                 }
             }
         }

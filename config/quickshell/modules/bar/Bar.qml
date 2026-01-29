@@ -1,79 +1,68 @@
 import Quickshell
-import QtQuick
+import Quickshell.Wayland
 import QtQuick.Layouts
-import Quickshell.Services.SystemTray
-import Quickshell.Widgets
+import QtQuick
+import qs.components
+
 import "../../core"
 
 PanelWindow {
-    id: root
+    id: barRoot
+
     property var modelData
-    signal notificationCenterRequested
     screen: modelData || null
 
-    anchors.top: true
-    anchors.left: true
-    anchors.right: true
-    implicitHeight: Theme.values.barHeightS
+    anchors {
+        top: true
+        left: true
+        right: true
+    }
+
+    implicitHeight: Theme.settings.barHeightS
     color: Colors.colors.surface_container
+
+    WlrLayershell.layer: WlrLayer.Top
+    WlrLayershell.exclusionMode: ExclusionMode.Auto
 
     RowLayout {
         anchors.fill: parent
-        anchors.leftMargin: Theme.values.spacingM
-        anchors.rightMargin: Theme.values.spacingM
-        spacing: 0
+        anchors.leftMargin: Theme.settings.spacingM
+        anchors.rightMargin: Theme.settings.spacingM
+        spacing: Theme.settings.spacingL // Space between groups
 
+        // --- Left Side ---
+        Row {
+            Layout.alignment: Qt.AlignVCenter
+            spacing: Theme.settings.spacingM
+
+            SystemLogo {
+                Layout.alignment: Qt.AlignVCenter
+            }
+
+            Workspaces {}
+        }
+
+        // --- Center ---
         Item {
             Layout.fillWidth: true
-            Layout.preferredWidth: 1
-            Layout.fillHeight: true
-            Workspaces {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-            }
+        }
+
+        Clock {
+            Layout.alignment: Qt.AlignVCenter
         }
 
         Item {
             Layout.fillWidth: true
-            Layout.preferredWidth: 1
-            Layout.fillHeight: true
-
-            Item {
-                anchors.centerIn: parent
-                width: clockLoader.implicitWidth + 20
-                height: parent.height
-
-                Clock {
-                    id: clockLoader
-                    anchors.centerIn: parent
-                }
-
-                HoverHandler {
-                    id: clockHover
-                    cursorShape: Qt.PointingHandCursor
-                    onHoveredChanged: {
-                        if (hovered) {
-                            root.notificationCenterRequested();
-                        }
-                    }
-                }
-            }
         }
 
-        Item {
-            Layout.fillWidth: true
-            Layout.preferredWidth: 1
-            Layout.fillHeight: true
+        // --- Right Side ---
 
-            RowLayout {
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: Theme.values.spacingL
+        Tray {
+            barWindow: barRoot
+        }
 
-                Tray {}
-
-                BatteryPill {}
-            }
+        BatteryPill {
+            Layout.alignment: Qt.AlignVCenter
         }
     }
 }
